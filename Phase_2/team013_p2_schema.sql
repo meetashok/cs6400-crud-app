@@ -18,22 +18,22 @@ FLUSH PRIVILEGES;
 -- Tables
 
 CREATE TABLE `user` (
-  login_username varchar(50) NOT NULL,
-  login_password varchar(50) NOT NULL,
+  login_username varchar(20) NOT NULL,
+  login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
   user_last_name varchar(50) NOT NULL,
-  role varchar(25) NOT NULL,
+  role varchar(25) NOT NULL, -- should we limit the size of role to a single character? 
   PRIMARY KEY (login_username)
 );
 
 CREATE TABLE `customer` (
   customer_id int(32) unsigned NOT NULL AUTO_INCREMENT,
-  phone_number int(10) unsigned NOT NULL,
+  phone_number int(10) unsigned NOT NULL, -- Should be varchar, They advised against phone number being 10 digits it. e.g phone numbers with extension
   email varchar(50) NOT NULL,
   street varchar(50) NOT NULL,
   city varchar(50) NOT NULL,
   state varchar(50) NOT NULL,
-  postal_code int(10) NOT NULL,
+  postal_code int(10) NOT NULL, -- should be varchar
   PRIMARY KEY (customer_id),
   UNIQUE KEY (email)
 );
