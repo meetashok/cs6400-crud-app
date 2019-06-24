@@ -17,7 +17,7 @@ FLUSH PRIVILEGES;
 
 -- Tables
 
-CREATE TABLE `User` (
+CREATE TABLE `user` (
   login_username varchar(50) NOT NULL,
   login_password varchar(50) NOT NULL,
   user_first_name varchar(50) NOT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `User` (
   PRIMARY KEY (login_username)
 );
 
-CREATE TABLE `Customer` (
+CREATE TABLE `customer` (
   customer_id int(32) unsigned NOT NULL AUTO_INCREMENT,
   phone_number int(10) unsigned NOT NULL,
   email varchar(50) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE `Customer` (
   UNIQUE KEY (email)
 );
 
-CREATE TABLE `Individual` (
+CREATE TABLE `individual` (
   driver_license_number varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   individual_first_name varchar(50) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE `Individual` (
   UNIQUE KEY (customer_id)
 );
 
-CREATE TABLE `Business` (
+CREATE TABLE `business` (
   tax_id_number varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   business_name varchar(50) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE `Business` (
   UNIQUE KEY (customer_id)
 );
 
-CREATE TABLE `Sale` (
+CREATE TABLE `sale` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE `Sale` (
   PRIMARY KEY (vin)
 );
 
-CREATE TABLE `Purchase` (
+CREATE TABLE `purchase` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE `Purchase` (
 );
 
 -- TODO left off with Vehicle
-CREATE TABLE `Vehicle` (
+CREATE TABLE `vehicle` (
   vin varchar(50) NOT NULL,
   manufacturer_name
   type_name
