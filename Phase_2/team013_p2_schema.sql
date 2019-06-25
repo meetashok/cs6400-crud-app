@@ -17,16 +17,16 @@ FLUSH PRIVILEGES;
 
 -- Tables
 
-CREATE TABLE `User` (
-  login_username varchar(50) NOT NULL, -- should we limit the size of username and password to a smaller size, say 20 characters?
-  login_password varchar(50) NOT NULL, -- should we limit the size of username and password to a smaller size, say 20 characters?
+CREATE TABLE `user` (
+  login_username varchar(20) NOT NULL,
+  login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
   user_last_name varchar(50) NOT NULL,
   role varchar(25) NOT NULL, -- should we limit the size of role to a single character? 
   PRIMARY KEY (login_username)
 );
 
-CREATE TABLE `Customer` (
+CREATE TABLE `customer` (
   customer_id int(32) unsigned NOT NULL AUTO_INCREMENT,
   phone_number int(10) unsigned NOT NULL, -- Should be varchar, They advised against phone number being 10 digits it. e.g phone numbers with extension
   email varchar(50) NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE `Customer` (
   UNIQUE KEY (email)
 );
 
-CREATE TABLE `Individual` (
+CREATE TABLE `individual` (
   driver_license_number varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   individual_first_name varchar(50) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE `Individual` (
   UNIQUE KEY (customer_id)
 );
 
-CREATE TABLE `Business` (
+CREATE TABLE `business` (
   tax_id_number varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   business_name varchar(50) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE `Business` (
   UNIQUE KEY (customer_id)
 );
 
-CREATE TABLE `Sale` (
+CREATE TABLE `sale` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
@@ -65,7 +65,7 @@ CREATE TABLE `Sale` (
   PRIMARY KEY (vin)
 );
 
-CREATE TABLE `Purchase` (
+CREATE TABLE `purchase` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
@@ -73,7 +73,8 @@ CREATE TABLE `Purchase` (
   PRIMARY KEY (vin)
 );
 
-CREATE TABLE `Vehicle` (
+-- TODO left off with Vehicle
+CREATE TABLE `vehicle` (
   vin varchar(50) NOT NULL,
   manufacturer_name varchar(50) NOT NULL,
   type_name varchar(50) NOT NULL,
