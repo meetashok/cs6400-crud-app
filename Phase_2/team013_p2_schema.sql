@@ -73,17 +73,62 @@ CREATE TABLE `Purchase` (
   PRIMARY KEY (vin)
 );
 
--- TODO left off with Vehicle
 CREATE TABLE `Vehicle` (
   vin varchar(50) NOT NULL,
-  manufacturer_name
-  type_name
-  model_year
-  model_name
-  mileage
-  vehicle_condition
-  description
-  sales_price
-  kelly_blue_book_value
+  manufacturer_name varchar(50) NOT NULL,
+  type_name varchar(50) NOT NULL,
+  model_year smallint NOT NULL,
+  model_name varchar(50) NOT NULL,
+  mileage float(8) NOT NULL,
+  vehicle_condition varchar(10) NOT NULL,
+  description varchar(200) NOT NULL,
+  sales_price float(8) NOT NULL,
+  kelly_blue_book_value float(8) NOT NULL,
   PRIMARY KEY (vin)
 );
+
+CREATE TABLE `Vehicle-Color` (
+  vin varchar(50) NOT NULL,
+  color varchar(50) NOT NULL,
+  PRIMARY KEY (vin) -- Need to check
+);
+
+CREATE TABLE `Manufacturer` (
+  manufacturer_name varchar(50) NOT NULL,
+  PRIMARY KEY (manufacturer_name)
+);
+
+CREATE TABLE `VehicleType` (
+  type_name varchar(50) NOT NULL,
+  PRIMARY KEY (type_name)
+);
+
+CREATE TABLE `Repair` (
+  vin varchar(50) NOT NULL,
+  start_date date NOT NULL,
+  end_date date NOT NULL,
+  vendor_name varchar(50) NOT NULL,
+  nhtsa_number varchar(50) NULL,
+  total_cost float(8) NOT NULL,
+  repair_description varchar(200) NOT NULL, -- need to check if this can be NULL
+  status varchar(1) NOT NULL,
+  PRIMARY KEY (vin) -- need to check 
+);
+
+CREATE TABLE `Vendor` (
+  vendor_name varchar(50) NOT NULL,
+  vendor_phone_number varchar(20) NOT NULL,
+  street varchar(50) NOT NULL,
+  city varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
+  postal_code varchar(10) NOT NULL, -- should be varchar
+  PRIMARY KEY (vendor_name)
+);
+
+CREATE TABLE `Recall` (
+  nhtsa_number varchar(50) NOT NULL, --change in relationship mapping 
+  manufacturer_name varchar(50) NOT NULL,
+  recall_description varchar(200) NOT NULL, --change in relationship mapping 
+  PRIMARY KEY (nhtsa_number)
+);
+
