@@ -16,9 +16,9 @@ GRANT ALL PRIVILEGES ON `cs6400_sm19_team013`.* TO 'gatechUser'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Tables
--- Should we start the table names with capitals? 
+-- Should we start the table names with capitals?
 
-CREATE TABLE `User` (
+CREATE TABLE User (
   login_username varchar(20) NOT NULL,
   login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE Business (
   customer_id int(32) unsigned NOT NULL,
   business_name varchar(50) NOT NULL,
   primary_contact_name varchar(50) NOT NULL,
-  primacy_contact_title varchar(50) NOT NULL,
+  primary_contact_title varchar(50) NOT NULL,
   PRIMARY KEY (tax_id_number),
   UNIQUE KEY (customer_id)
 );
@@ -84,7 +84,7 @@ CREATE TABLE Vehicle (
   vehicle_condition varchar(10) NOT NULL,
   vehicle_description varchar(200) NOT NULL, -- change in relationship mapping 
   sales_price float(8) NOT NULL,
-  kelly_blue_book_value float(8) NOT NULL,
+  kbb_value float(8) NOT NULL,
   PRIMARY KEY (vin)
 );
 
@@ -134,7 +134,6 @@ CREATE TABLE Recall (
 );
 
 -- Constraints   Foreign Keys: FK_ChildTable_childColumn_ParentTable_parentColumn
-
 ALTER TABLE Individual
   ADD CONSTRAINT fk_Individual_customer_id_Customer_customer_id FOREIGN KEY (customer_id) REFERENCES Customer (customer_id);
   
