@@ -61,7 +61,7 @@ CREATE TABLE `sale` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
-  sales_date date NOT NULL
+  sales_date date DEFAULT CURRENT_DATE
   PRIMARY KEY (vin)
 );
 
@@ -69,7 +69,7 @@ CREATE TABLE `purchase` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
-  purchase_date date NOT NULL,
+  purchase_date date DEFAULT CURRENT_DATE,
   PRIMARY KEY (vin)
 );
 
