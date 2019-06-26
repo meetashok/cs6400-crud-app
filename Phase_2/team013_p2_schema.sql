@@ -125,10 +125,11 @@ CREATE TABLE `vendor` (
 );
 
 CREATE TABLE `recall` (
+  vin varchar(50) NOT NULL,
   nhtsa_recall_number varchar(50) NOT NULL, 
   manufacturer_name varchar(50) NOT NULL,
   recall_description varchar(200) NOT NULL,
-  PRIMARY KEY (nhtsa_recall_number)
+  PRIMARY KEY (vin, nhtsa_recall_number)
 );
 
 -- Constraints   Foreign Keys: FK_ChildTable_childColumn_ParentTable_parentColumn
