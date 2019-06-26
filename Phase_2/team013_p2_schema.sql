@@ -22,7 +22,7 @@ CREATE TABLE `user` (
   login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
   user_last_name varchar(50) NOT NULL,
-  user_role varchar(25) NOT NULL, 
+  `role` varchar(25) NOT NULL, 
   PRIMARY KEY (login_username)
 );
 
@@ -162,3 +162,7 @@ ALTER TABLE `repair`
   ADD CONSTRAINT fk_repair_vin_vendor_vendor_name FOREIGN KEY (vendor_name) REFERENCES `vendor` (vendor_name);
 ALTER TABLE `repair`
   ADD CONSTRAINT fk_repair_nhtsa_number_recall_nhtsa_recall_number FOREIGN KEY (nhtsa_recall_number) REFERENCES `recall` (nhtsa_recall_number);
+
+SELECT count(distinct(vin)) as number_of_vehicles
+FROM `repair` 
+WHERE status != 'Complete';
