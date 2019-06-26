@@ -22,20 +22,19 @@ CREATE TABLE `user` (
   login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
   user_last_name varchar(50) NOT NULL,
-  `role` varchar(25) NOT NULL, 
+  role varchar(25) NOT NULL, 
   PRIMARY KEY (login_username)
 );
 
 CREATE TABLE `customer` (
   customer_id int(32) unsigned NOT NULL AUTO_INCREMENT,
   phone_number varchar(20) NOT NULL, 
-  email varchar(50) NOT NULL,
+  email varchar(50) NULL,
   street varchar(50) NOT NULL,
   city varchar(50) NOT NULL,
-  state_name varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
   postal_code varchar(15) NOT NULL,
   PRIMARY KEY (customer_id),
-  UNIQUE KEY (email)
 );
 
 CREATE TABLE `individual` (
@@ -120,7 +119,7 @@ CREATE TABLE `vendor` (
   vendor_phone_number varchar(20) NOT NULL,
   street varchar(50) NOT NULL,
   city varchar(50) NOT NULL,
-  state_name varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
   postal_code varchar(15) NOT NULL, 
   PRIMARY KEY (vendor_name)
 );
