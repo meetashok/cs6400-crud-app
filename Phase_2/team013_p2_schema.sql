@@ -22,20 +22,19 @@ CREATE TABLE `user` (
   login_password varchar(20) NOT NULL,
   user_first_name varchar(50) NOT NULL,
   user_last_name varchar(50) NOT NULL,
-  user_role varchar(25) NOT NULL, 
+  role varchar(25) NOT NULL, 
   PRIMARY KEY (login_username)
 );
 
 CREATE TABLE `customer` (
   customer_id int(32) unsigned NOT NULL AUTO_INCREMENT,
   phone_number varchar(20) NOT NULL, 
-  email varchar(50) NOT NULL,
+  email varchar(50) NULL,
   street varchar(50) NOT NULL,
   city varchar(50) NOT NULL,
-  state_name varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
   postal_code varchar(15) NOT NULL,
   PRIMARY KEY (customer_id),
-  UNIQUE KEY (email)
 );
 
 CREATE TABLE `individual` (
@@ -61,7 +60,7 @@ CREATE TABLE `sale` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
-  sales_date date NOT NULL
+  sales_date date DEFAULT CURRENT_DATE
   PRIMARY KEY (vin)
 );
 
@@ -69,7 +68,7 @@ CREATE TABLE `purchase` (
   vin varchar(50) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
-  purchase_date date NOT NULL,
+  purchase_date date DEFAULT CURRENT_DATE,
   PRIMARY KEY (vin)
 );
 
@@ -120,7 +119,7 @@ CREATE TABLE `vendor` (
   vendor_phone_number varchar(20) NOT NULL,
   street varchar(50) NOT NULL,
   city varchar(50) NOT NULL,
-  state_name varchar(50) NOT NULL,
+  state varchar(50) NOT NULL,
   postal_code varchar(15) NOT NULL, 
   PRIMARY KEY (vendor_name)
 );
@@ -162,3 +161,7 @@ ALTER TABLE `repair`
   ADD CONSTRAINT fk_repair_vin_vendor_vendor_name FOREIGN KEY (vendor_name) REFERENCES `vendor` (vendor_name);
 ALTER TABLE `repair`
   ADD CONSTRAINT fk_repair_nhtsa_number_recall_nhtsa_recall_number FOREIGN KEY (nhtsa_recall_number) REFERENCES `recall` (nhtsa_recall_number);
+
+SELECT count(distinct(vin)) as number_of_vehicles
+FROM `repair` 
+WHERE status != 'Complete';
