@@ -57,7 +57,7 @@ CREATE TABLE `business` (
 );
 
 CREATE TABLE `sale` (
-  vin varchar(50) NOT NULL,
+  vin varchar(17) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
   sales_date date DEFAULT CURRENT_DATE
@@ -65,7 +65,7 @@ CREATE TABLE `sale` (
 );
 
 CREATE TABLE `purchase` (
-  vin varchar(50) NOT NULL,
+  vin varchar(17) NOT NULL,
   customer_id int(32) unsigned NOT NULL,
   login_username varchar(50) NOT NULL,
   purchase_date date DEFAULT CURRENT_DATE,
@@ -73,7 +73,7 @@ CREATE TABLE `purchase` (
 );
 
 CREATE TABLE `vehicle` (
-  vin varchar(50) NOT NULL,
+  vin varchar(17) NOT NULL,
   manufacturer_name varchar(50) NOT NULL,
   vehicle_type varchar(50) NOT NULL,
   model_year int(11) NOT NULL,
@@ -87,7 +87,7 @@ CREATE TABLE `vehicle` (
 );
 
 CREATE TABLE `vehicle_color` (
-  vin varchar(50) NOT NULL,
+  vin varchar(17) NOT NULL,
   color varchar(50) NOT NULL,
   PRIMARY KEY (vin, color) 
 );
@@ -103,7 +103,7 @@ CREATE TABLE `vehicle_type` (
 );
 
 CREATE TABLE `repair` (
-  vin varchar(50) NOT NULL,
+  vin varchar(17) NOT NULL,
   repair_start_date date NOT NULL, 
   repair_end_date date NOT NULL,
   vendor_name varchar(50) NOT NULL,
@@ -125,11 +125,10 @@ CREATE TABLE `vendor` (
 );
 
 CREATE TABLE `recall` (
-  vin varchar(50) NOT NULL,
   nhtsa_recall_number varchar(50) NOT NULL, 
   manufacturer_name varchar(50) NOT NULL,
   recall_description varchar(200) NOT NULL,
-  PRIMARY KEY (vin, nhtsa_recall_number)
+  PRIMARY KEY (nhtsa_recall_number)
 );
 
 -- Constraints   Foreign Keys: FK_ChildTable_childColumn_ParentTable_parentColumn
