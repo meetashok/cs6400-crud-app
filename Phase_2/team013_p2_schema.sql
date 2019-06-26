@@ -107,7 +107,7 @@ CREATE TABLE `repair` (
   repair_start_date date NOT NULL, 
   repair_end_date date NOT NULL,
   vendor_name varchar(50) NOT NULL,
-  nhtsa_number varchar(50) NULL,
+  nhtsa_recall_number varchar(50) NULL,
   total_cost float(8) NOT NULL,
   repair_description varchar(200) NOT NULL, 
   vehicle_status varchar(1) NOT NULL, 
@@ -128,7 +128,7 @@ CREATE TABLE `recall` (
   nhtsa_recall_number varchar(50) NOT NULL, 
   manufacturer_name varchar(50) NOT NULL,
   recall_description varchar(200) NOT NULL,
-  PRIMARY KEY (nhtsa_number)
+  PRIMARY KEY (nhtsa_recall_number)
 );
 
 -- Constraints   Foreign Keys: FK_ChildTable_childColumn_ParentTable_parentColumn
@@ -160,8 +160,4 @@ ALTER TABLE `repair`
 ALTER TABLE `repair`
   ADD CONSTRAINT fk_repair_vin_vendor_vendor_name FOREIGN KEY (vendor_name) REFERENCES `vendor` (vendor_name);
 ALTER TABLE `repair`
-  ADD CONSTRAINT fk_repair_nhtsa_number_recall_nhtsa_recall_number FOREIGN KEY (nhtsa_recall_number) REFERENCES `recall` (nhtsa_recall_number);
-
-SELECT count(distinct(vin)) as number_of_vehicles
-FROM `repair` 
-WHERE status != 'Complete';
+  ADD CONSTRAINT fk_repair_nhtsa_recall_number_recall_nhtsa_recall_number FOREIGN KEY (nhtsa_recall_number) REFERENCES `recall` (nhtsa_recall_number);
