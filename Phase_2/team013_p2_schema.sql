@@ -7,7 +7,7 @@ SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS cs6400_sm19_team013 
   DEFAULT CHARACTER SET utf8mb4 
   DEFAULT COLLATE utf8mb4_unicode_ci;
-USE cs6400_fa17_team001;
+USE cs6400_sm19_team013;
 
 GRANT SELECT, INSERT, UPDATE, DELETE, FILE ON *.* TO 'gatechUser'@'localhost';
 GRANT ALL PRIVILEGES ON `gatechuser`.* TO 'gatechUser'@'localhost'; -- run this to check for errors
@@ -32,7 +32,7 @@ CREATE TABLE `customer` (
   city varchar(50) NOT NULL,
   state varchar(50) NOT NULL,
   postal_code varchar(15) NOT NULL,
-  PRIMARY KEY (customer_id),
+  PRIMARY KEY (customer_id)
 );
 
 CREATE TABLE `individual` (
