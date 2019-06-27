@@ -15,8 +15,6 @@ GRANT ALL PRIVILEGES ON `cs6400_sm19_team013`.* TO 'gatechUser'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Tables
--- Review any inconsistencies between this file and relationship mapping 
-
 CREATE TABLE `user` (
   login_username varchar(20) NOT NULL,
   login_password varchar(20) NOT NULL,
