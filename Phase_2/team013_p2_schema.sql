@@ -108,7 +108,7 @@ CREATE TABLE `repair` (
   nhtsa_recall_number varchar(50) NULL,
   total_cost float(8) NOT NULL,
   repair_description varchar(200) NOT NULL, 
-  repair_status varchar(1) NOT NULL, 
+  repair_status varchar(15) NOT NULL, 
   PRIMARY KEY (vin, repair_start_date) 
 );
 
