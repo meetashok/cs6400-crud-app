@@ -14,6 +14,7 @@ GRANT ALL PRIVILEGES ON `gatechuser`.* TO 'gatechUser'@'localhost'; -- run this 
 GRANT ALL PRIVILEGES ON `cs6400_sm19_team013`.* TO 'gatechUser'@'localhost';
 FLUSH PRIVILEGES;
 
+
 -- Tables
 CREATE TABLE `user` (
   login_username varchar(20) NOT NULL,
