@@ -2,6 +2,7 @@
 *.swp
 *.swo
 *~
+__pycache__/
 create_database_mysql.sql
 report_01.sql
 report_02.sql
@@ -10,3 +11,4 @@ report_04.sql
 report_05.sql
 report_06_01.sql
 report_06_02.sql
+eer_draft.drawio

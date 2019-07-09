@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="POST" action="/addindividual">
+    {{ form.csrf_token }}
+    
+    {{ form.phone_number.label }} 
+    {{ form.phone_number }} 
+    <br>
+    {{ form.email.label }} 
+    {{ form.email }} 
+    <br>
+    {{ form.street.label }} 
+    {{ form.street }} 
+    <br>
+    {{ form.city.label }} 
+    {{ form.city }} 
+    <br>
+    {{ form.state.label }} 
+    {{ form.state }} 
+    <br>
+    {{ form.postal_code.label }} 
+    {{ form.postal_code }} 
+    <br>
+    {{ form.submit }}
+</form>
+{% endblock %}
