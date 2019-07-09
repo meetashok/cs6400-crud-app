@@ -13,10 +13,6 @@ def home():
 def welcome():
     return render_template('welcome.html')  # render a template
 
-# start the server with the 'run()' method
-if __name__ == '__main__':
-    app.run(debug=True)
-
 
 # route decorator for login page logic
 @app.route('/login', methods=['GET','POST'])
@@ -28,3 +24,7 @@ def login():
 	    else:
 	    	return redirect(url_for('home'))
 	return render_template('login.html', error=error)
+
+	# start the server with the 'run()' method
+if __name__ == '__main__':
+    app.run(debug=True)
