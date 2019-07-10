@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
 
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
