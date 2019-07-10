@@ -23,45 +23,7 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-
-# Create forms
-class IndividualForm(FlaskForm):
-    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
-    email = StringField("Email address")
-    street = StringField("Street", validators=[validators.DataRequired()])
-    city = StringField("City", validators=[validators.DataRequired()])
-    state = StringField("State", validators=[validators.DataRequired()])
-    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
-
-    # driver_license_number = StringField("Driver license number", validators=[validators.DataRequired()])
-    # individual_first_name = StringField("First name", validators=[validators.DataRequired()])
-    # individual_last_name = StringField("Last name", validators=[validators.DataRequired()])
-    submit = SubmitField("Send")
-
-class BusinessForm(FlaskForm):
-    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
-    email = StringField("Email address", validators=[])
-    street = StringField("Street", validators=[validators.DataRequired()])
-    city = StringField("City", validators=[validators.DataRequired()])
-    state = StringField("State", validators=[validators.DataRequired()])
-    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
-
-    tax_id_number = StringField("Business tax ID", validators=[validators.DataRequired()])
-    business_name = StringField("Business name", validators=[validators.DataRequired()])
-    pc_name = StringField("Primary contact name", validators=[validators.DataRequired()])
-    pc_title = StringField("Primary contact title", validators=[validators.DataRequired()])
-
-
-class SearchForm(FlaskForm):
-    vehicle_type = StringField("Vehicle Type", validators=[])
-    manufacturer_name = StringField("Manufacturer Type", validators=[])
-    color = StringField("Color", validators=[])
-    model_year = StringField("Model Year", validators=[])
-    keyword = StringField("Keyword Search", validators=[])
-
-
-# class RepairForm(FlaskForm):
-#     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
+# cursor = mysql.connection.cursor()
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
@@ -269,16 +231,16 @@ def dropdown():
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT 
-  customer_id,
   customer_name,
   COUNT(*) AS vehicles_sold,
-  AVG(purchase_price) AS avg_purchase_price,
-  AVG(number_of_repairs) AS avg_number_of_repairs
+  ROUND(AVG(purchase_price),2) AS avg_purchase_price,
+  COALESCE(ROUND(AVG(number_of_repairs),2),0) AS avg_number_of_repairs
 FROM
 (SELECT
   customer.customer_id,
-  individual.individual_first_name + " " + individual.individual_last_name AS customer_name,
+  CONCAT(individual.individual_first_name," ",individual.individual_last_name) AS customer_name,
   vehicle.vin,
   a.number_of_repairs,
   vehicle.kbb_value AS purchase_price

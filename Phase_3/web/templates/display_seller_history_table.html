@@ -6,7 +6,6 @@
   <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">Customer ID</th>
       <th scope="col">Customer Name</th>
       <th scope="col">Vehicles Sold</th>
       <th scope="col">Avg Purchase Price</th>
@@ -15,33 +14,24 @@
   </thead>
   <tbody id="tby1">
 	{% for item in data %}
-	<tr>
-	    <td>{{item[0]}}</td>
-	    <td>{{item[1]}}</td>
-	    <td>{{item[2]}}</td>
-	    <td>{{item[3]}}</td>
-      <td>{{item[4]}}</td>
-	</tr>
+    {% if item[3] >= 5 %}
+      <tr class="bg-danger">
+          <td>{{item[0]}}</td>
+          <td>{{item[1]}}</td>
+          <td>{{item[2]}}</td>
+          <td>{{item[3]}}</td>
+      </tr> 
+    {% endif %}
+    {% if item[3] < 5 %}
+      <tr>
+          <td>{{item[0]}}</td>
+          <td>{{item[1]}}</td>
+          <td>{{item[2]}}</td>
+          <td>{{item[3]}}</td>
+      </tr>
+    {% endif %}
 	{% endfor %}
   </tbody>
   </table>
-  <script type="text/javascript">
-   function color() {
-        var val = 0; //value to be compared with
-        var ColIndexToCheck=4;
-        var header = document.getElementById("tby1");
-        for (var j = 0; j < header.length; j++) {
-        if (header[j].innerHTML >= 5) 
-           ColIndexToCheck=j;
-        }
-
-          var trs= document.getElementById("tby1").getElementsByTagName("tr");
-            for (var i = 0; i < trs.length; i++) {
-                if (trs[i].cells[ColIndexToCheck].innerHTML > val) {
-                    trs[i].cells[ColIndexToCheck].style.backgroundColor = "red";
-                }
-            }
-        }
-  </script>
 </div>
 {% endblock %}
