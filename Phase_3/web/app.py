@@ -5,6 +5,9 @@ from flask_bootstrap import Bootstrap
 
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
+import sql.sql_codes as sql
+# NOTE usage: sql.queries
+
 # create the application object
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
@@ -19,23 +22,123 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# use decorators to link the function to a url
-@app.route('/', methods=["GET", "POST"])
-def welcome(query="DEFAULT"):
-    return render_template('main.html', query=query)  # render a template
 
+# Create forms
+class IndividualForm(FlaskForm):
+    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
+    email = StringField("Email address")
+    street = StringField("Street", validators=[validators.DataRequired()])
+    city = StringField("City", validators=[validators.DataRequired()])
+    state = StringField("State", validators=[validators.DataRequired()])
+    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
+
+    # driver_license_number = StringField("Driver license number", validators=[validators.DataRequired()])
+    # individual_first_name = StringField("First name", validators=[validators.DataRequired()])
+    # individual_last_name = StringField("Last name", validators=[validators.DataRequired()])
+    submit = SubmitField("Send")
+
+class BusinessForm(FlaskForm):
+    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
+    email = StringField("Email address", validators=[])
+    street = StringField("Street", validators=[validators.DataRequired()])
+    city = StringField("City", validators=[validators.DataRequired()])
+    state = StringField("State", validators=[validators.DataRequired()])
+    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
+
+    tax_id_number = StringField("Business tax ID", validators=[validators.DataRequired()])
+    business_name = StringField("Business name", validators=[validators.DataRequired()])
+    pc_name = StringField("Primary contact name", validators=[validators.DataRequired()])
+    pc_title = StringField("Primary contact title", validators=[validators.DataRequired()])
+
+
+class SearchForm(FlaskForm):
+    vehicle_type = StringField("Vehicle Type", validators=[])
+    manufacturer_name = StringField("Manufacturer Type", validators=[])
+    color = StringField("Color", validators=[])
+    model_year = StringField("Model Year", validators=[])
+    keyword = StringField("Keyword Search", validators=[])
+
+
+# class RepairForm(FlaskForm):
+#     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
+
+# main page with vehicle count, login, and search
+@app.route('/', methods=['GET', 'POST'])
+def main(query="DEFAULT"):
+    cursor = mysql.connection.cursor()
+    cursor.execute(("""SELECT
+      count(vehicle.vin) as vehicles_available
+FROM vehicle 
+LEFT JOIN
+(
+  SELECT
+    distinct(vin)  as vin
+  FROM repair
+  WHERE repair_status IN ('In Progress','Pending')
+) vehicle_in_repair 
+ON vehicle.vin=vehicle_in_repair.vin
+LEFT JOIN sale
+  ON vehicle.vin=sale.vin
+WHERE 
+  vehicle_in_repair.vin IS NULL AND
+  sale.sales_date IS NULL;"""),)
+    vehicle_data = cursor.fetchall()
+    mysql.connection.commit() 
+
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+            error = 'Invalid Credentials. Please try again.'
+        else:
+          return redirect(url_for('main'))  ###here will use separate authenticated main pages?
+
+    return render_template('main.html', vehicle_data=vehicle_data, query=query, error=error)  # render a template
+"""
+def search():
+    form = SearchForm()
+    if request.method == "GET":
+        return render_template('main.html', form=form)
+
+    if request.method == "POST":
+        if form.validate() == True:
+            vehicle_type = form.vehicle_type.data
+            manufacturer_name = form.manufacturer_name.data
+            color = form.color.data
+            model_year = form.model_year.data
+            keyword = form.keyword.data
+
+            
+            cursor = mysql.connection.cursor()
+            query2 = "SELECT * FROM vehicle"
+            #variables = vehicle_type, manufacturer_name, color, model_year, keyword
+            cursor.execute((query, variables))
+            mysql.connection.commit()
+            # return render_template('welcome.html', query="query")
+            return redirect(url_for("main"))
+
+        else:
+            return render_template('main.html', form=form)
+""" 
+
+
+
+"""
 # route decorator for login page logic
 @app.route('/login', methods=['GET','POST'])
 def login():
-	error = None
-	if request.method == 'POST':
-	    if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-	        error = 'Invalid Credentials. Please try again.'
-	    else:
-	    	return redirect(url_for('home'))
-	return render_template('login.html', error=error)
+  error = None
+  if request.method == 'POST':
+      if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+          error = 'Invalid Credentials. Please try again.'
+      else:
+        return redirect(url_for('home'))
+  return render_template('login.html', error=error)
+"""
 
-# Create forms
+
+
+# @app.route('/repair')
+# @app.route('/repairs')
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
