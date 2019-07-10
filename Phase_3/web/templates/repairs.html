@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+
+
 {% block content %}
 <!-- Page Content -->
 <div class="container">
@@ -44,35 +46,44 @@
       <form action="/repairs/vin=12345" method="POST">
       <div class="form-group">
         <label for="vin">VIN</label>
-        <input type="text" class="form-control" id="vin" aria-describedby="emailHelp" placeholder="Enter VIN">
+        <input type="text" class="form-control" id="vin" aria-describedby="emailHelp" placeholder="Enter VIN" name="vin" value="{{ vin }}">
+        
+        
       </div>
       <div class="form-group">
         <label for="repair_start_date">Repair Start Date</label>
-        <input type="text" class="form-control" id="repair_start_date" placeholder="repair_start_date">
+        <input type="text" class="form-control" id="repair_start_date" placeholder="repair_start_date" name="repair_start_date">
+        
       </div>
       <div class="form-group">
         <label for="repair_end_date">Repair End Date</label>
-        <input type="text" class="form-control" id="repair_end_date" placeholder="repair_end_date">
+        <input type="text" class="form-control" id="repair_end_date" placeholder="repair_end_date" name="repair_end_date">
+        
       </div>
       <div class="form-group">
         <label for="vendor_name">Vendor Name</label>
-        <input type="text" class="form-control" id="vendor_name" placeholder="vendor_name">
+        <input type="text" class="form-control" id="vendor_name" placeholder="vendor_name" name="vendor_name">
+        
       </div>
       <div class="form-group">
         <label for="nhtsa_recall_number">NHTSA Recall Number</label>
-        <input type="text" class="form-control" id="nhtsa_recall_number" placeholder="nhtsa_recall_number">
+        <input type="text" class="form-control" id="nhtsa_recall_number" placeholder="nhtsa_recall_number" name="nhtsa_recall_number">
+        
       </div>
       <div class="form-group">
         <label for="total_cost">Total Cost</label>
-        <input type="text" class="form-control" id="total_cost" placeholder="total_cost">
+        <input type="text" class="form-control" id="total_cost" placeholder="total_cost" name="total_cost">
+        
       </div>
       <div class="form-group">
         <label for="repair_description">Repair Description</label>
-        <input type="text" class="form-control" id="repair_description" placeholder="repair_description">
+        <input type="text" class="form-control" id="repair_description" placeholder="repair_description" name="repair_description">
+        
       </div>
       <div class="form-group">
-        <label for="vehicle_status">Vehicle Status</label>
-        <input type="text" class="form-control" id="vehicle_status" placeholder="vehicle_status">
+        <label for="repair_status">Repair Status</label>
+        <input type="text" class="form-control" id="repair_status" placeholder="repair_status" name="repair_status">
+        
       </div>
       <button type="submit" class="btn btn-primary">Add Repair</button>
       </form>

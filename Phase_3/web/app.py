@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, validators, Form, SubmitField
+from wtforms import StringField, validators, Form, SubmitField, DateField, FloatField, TextAreaField
 
 # create the application object
 app = Flask(__name__)
@@ -65,11 +65,25 @@ class BusinessForm(FlaskForm):
     pc_name = StringField("Primary contact name", validators=[validators.DataRequired()])
     pc_title = StringField("Primary contact title", validators=[validators.DataRequired()])
 
-# class RepairForm(FlaskForm):
-#     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
+class VendorForm(FlaskForm):
+    vendor_name = StringField("Vendor name", validators=[validators.DataRequired()])
+    vendor_phone_number = StringField("Phone number", validators=[validators.DataRequired()])
+    street = StringField("Street", validators=[validators.DataRequired()])
+    city = StringField("City", validators=[validators.DataRequired()])
+    state = StringField("State", validators=[validators.DataRequired()])
+    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
 
-# @app.route('/repair')
-# @app.route('/repairs')
+class RepairForm(FlaskForm):
+    vin = StringField("VIN", validators=[validators.DataRequired()])
+    repair_start_date = DateField("Start date")
+    repair_end_date = DateField("End date")
+    vendor_name = StringField("Vendor name")
+    nhtsa_recall_number = StringField("NHTSA recall number")
+    total_cost = FloatField("Repair cost")
+    repair_description = StringField("Description")
+
+@app.route('/repair')
+@app.route('/repairs')
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
@@ -78,9 +92,27 @@ def repairs(vin="BLANK"):
     repair_data = cursor.fetchall()
     mysql.connection.commit()
     post_confirm = "nope"
+
+    form = RepairForm()
     if request.method == "POST":
-        post_confirm = "YUP"
-    return render_template("repairs.html", vin=vin, repair_data=repair_data, confirm=post_confirm)
+        post_confirm = request.form
+        # if form.validate() == True:
+        # vin = request.form.get["vin"]
+        # repair_start_date = form.repair_start_date.data 
+        # repair_end_date = form.repair_end_date.data 
+        # vendor_name = form.vendor_name.data 
+        # nhtsa_recall_number = form.nhtsa_recall_number.data 
+        # total_cost = form.total_cost.data 
+        # repair_description = form.repair_description.data 
+        # repair_status = "Pending"
+
+        #cursor = mysql.connection.cursor()
+        #cursor.execute("INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (vin, repair_start_date, repair_end_date, vendor_name, nhtsa_recall_number, total_cost, repair_description, repair_status))
+        #mysql.connection.commit()
+        #return redirect(url_for("repairs"))
+        # else:
+        #     return redirect(url_for("welcome"))
+    return render_template("repairs.html", vin=vin, repair_data=repair_data, confirm=post_confirm, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual():
