@@ -5,6 +5,9 @@ from flask_mysqldb import MySQL
 from flask_wtf import FlaskForm
 from wtforms import StringField, validators, Form, SubmitField
 
+import sql.sql_codes as sql
+# NOTE usage: sql.queries
+
 # create the application object
 app = Flask(__name__)
 app.secret_key = 'development key'
@@ -216,8 +219,8 @@ WHERE
 GROUP BY vehicle_type) AS a
 on vehicle_type.vehicle_type=a.vehicle_type;
   """)
-    data = cursor.fetchall()
-    return render_template("display_inventory_age_table.html", data=data)
+  data = cursor.fetchall()
+  return render_template("display_inventory_age_table.html", data=data)
 
 
 @app.route('/report/averagetimeininventory', methods=['GET'])
