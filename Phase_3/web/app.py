@@ -19,13 +19,9 @@ app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
 # use decorators to link the function to a url
-@app.route('/')
-def home():
-    return "Hello, World!"  # return a string
-
-@app.route('/welcome', methods=["GET", "POST"])
+@app.route('/', methods=["GET", "POST"])
 def welcome(query="DEFAULT"):
-    return render_template('welcome.html', query=query)  # render a template
+    return render_template('main.html', query=query)  # render a template
 
 # route decorator for login page logic
 @app.route('/login', methods=['GET','POST'])
