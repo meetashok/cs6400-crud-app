@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Page Content -->
+<div class="container">
+  <h1 class="mt-4">Repair Statistics Report!</h1>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Vendor Name</th>
+      <th scope="col">Number Of Repairs</th>
+      <th scope="col">Total Spend</th>
+      <th scope="col">Number Of Vehicles</th>
+      <th scope="col">Average Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+	{% for item in data %}
+	<tr>
+	    <td>{{item[0]}}</td>
+	    <td>{{item[1]}}</td>
+	    <td>{{item[2]}}</td>
+	    <td>{{item[3]}}</td>
+      <td>{{item[4]}}</td>
+	</tr>
+	{% endfor %}
+  </tbody>
+  </table>
+</div>
+{% endblock %}

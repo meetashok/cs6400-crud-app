@@ -79,7 +79,7 @@ CREATE TABLE `vehicle` (
   model_name varchar(50) NOT NULL,
   mileage float(8) NOT NULL,
   vehicle_condition varchar(10) NOT NULL,
-  vehicle_description varchar(200) NOT NULL, 
+  vehicle_description varchar(200), 
   sales_price float(8) NOT NULL,
   kbb_value float(8) NOT NULL,
   PRIMARY KEY (vin)
