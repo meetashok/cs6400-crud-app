@@ -129,7 +129,7 @@ def dropdown():
     if form.validate_on_submit():
         return render_template('test.html', colours=colours)
 
-@app.route('/reoport/sellerhistory', methods=['GET'])
+@app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
     cursor.execute("""SELECT 
   customer_id,
@@ -189,9 +189,39 @@ GROUP BY customer_id, customer_name
 ORDER BY
   vehicles_sold DESC,
   avg_purchase_price ASC;
-""")
+  """)
     data = cursor.fetchall()
     return render_template("display_seller_history_table.html", data=data)
+
+
+
+
+@app.route('/report/inventoryage', methods=['GET'])
+def get_InventoryAge():
+    cursor.execute("""SELECT
+  vehicle_type.vehicle_type,
+  COALESCE(a.min_age, 'N/A') AS min_age,
+  COALESCE(a.avg_age, 'N/A') AS avg_age,
+  COALESCE(a.max_age, 'N/A') AS max_age
+FROM vehicle_type
+LEFT JOIN 
+(SELECT
+  vehicle_type, 
+  MIN(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS min_age, 
+  AVG(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS avg_age,
+  MAX(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS max_age
+FROM vehicle 
+LEFT JOIN purchase
+ON vehicle.vin=purchase.vin
+LEFT JOIN sale
+ON vehicle.vin=sale.vin
+WHERE 
+  sale.sales_date IS NULL
+GROUP BY vehicle_type) AS a
+on vehicle_type.vehicle_type=a.vehicle_type;
+  """)
+    data = cursor.fetchall()
+    return render_template("display_inventory_age_table.html", data=data)
 
 if __name__ == "__main__":
     app.run(debug=True)
