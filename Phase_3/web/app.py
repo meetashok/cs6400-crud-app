@@ -21,21 +21,6 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# use decorators to link the function to a url
-@app.route('/', methods=["GET", "POST"])
-def welcome(query="DEFAULT"):
-    return render_template('main.html', query=query)  # render a template
-
-# route decorator for login page logic
-@app.route('/login', methods=['GET','POST'])
-def login():
-	error = None
-	if request.method == 'POST':
-	    if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-	        error = 'Invalid Credentials. Please try again.'
-	    else:
-	    	return redirect(url_for('home'))
-	return render_template('login.html', error=error)
 
 # Create forms
 class IndividualForm(FlaskForm):
@@ -66,6 +51,44 @@ class BusinessForm(FlaskForm):
 
 # class RepairForm(FlaskForm):
 #     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
+
+# use decorators to link the function to a url
+@app.route('/', methods=["GET", "POST"])
+def welcome(query="DEFAULT"):
+    cursor = mysql.connection.cursor()
+    cursor.execute(("""SELECT
+      count(vehicle.vin) as vehicles_available
+FROM vehicle 
+LEFT JOIN
+(
+  SELECT
+    distinct(vin)  as vin
+  FROM repair
+  WHERE repair_status IN ('In Progress','Pending')
+) vehicle_in_repair 
+ON vehicle.vin=vehicle_in_repair.vin
+LEFT JOIN sale
+  ON vehicle.vin=sale.vin
+WHERE 
+  vehicle_in_repair.vin IS NULL AND
+  sale.sales_date IS NULL;"""),)
+    vehicle_data = cursor.fetchall()
+    mysql.connection.commit()  
+    return render_template('main.html', vehicle_data=vehicle_data, query=query)  # render a template
+
+# route decorator for login page logic
+@app.route('/login', methods=['GET','POST'])
+def login():
+  error = None
+  if request.method == 'POST':
+      if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+          error = 'Invalid Credentials. Please try again.'
+      else:
+        return redirect(url_for('home'))
+  return render_template('login.html', error=error)
+
+
+
 
 # @app.route('/repair')
 # @app.route('/repairs')
