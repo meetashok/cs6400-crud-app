@@ -5,6 +5,9 @@ from flask_mysqldb import MySQL
 from flask_wtf import FlaskForm
 from wtforms import StringField, validators, Form, SubmitField
 
+import sql.sql_codes as sql
+# NOTE usage: sql.queries
+
 # create the application object
 app = Flask(__name__)
 app.secret_key = 'development key'
