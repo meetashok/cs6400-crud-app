@@ -295,6 +295,7 @@ ORDER BY
 
 @app.route('/report/inventoryage', methods=['GET'])
 def get_InventoryAge():
+  cursor = mysql.connection.cursor()
   cursor.execute("""SELECT
   vehicle_type.vehicle_type,
   COALESCE(a.min_age, 'N/A') AS min_age,
@@ -323,6 +324,7 @@ on vehicle_type.vehicle_type=a.vehicle_type;
 
 @app.route('/report/averagetimeininventory', methods=['GET'])
 def get_AvgTimeInInventory():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vehicle_type.vehicle_type,
   COALESCE(a.min_age, 'N/A') AS min_age,
@@ -352,6 +354,7 @@ ON a.vehicle_type=vehicle_type.vehicle_type;
 
 @app.route('/report/priceperrepair', methods=['GET'])
 def get_PricePerRepair():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vehicle_type,
   AVG(CASE WHEN vehicle_condition='Excellent' THEN kbb_value ELSE 0 END) AS 'Condition=Excellent',
@@ -368,6 +371,7 @@ GROUP BY vehicle_type;
 
 @app.route('/report/repairstatistics', methods=['GET'])
 def get_RepairStats():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vendor_name,
   COUNT(*) AS number_of_repairs, 
@@ -386,6 +390,7 @@ GROUP BY vendor_name;
 
 @app.route('/report//monthlysales', methods=['GET'])
 def get_MonthlySales():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT 
   DATE_FORMAT(sales_date, '%Y-%m') as ym,
   COUNT(1) AS number_of_vehicles,
@@ -415,7 +420,26 @@ GROUP BY ym
 order by ym DESC;
     """)
     data = cursor.fetchall()
-    return render_template("display_monthly_sales_table.html", data=data)
+    cursor2 = mysql.connection.cursor()
+    cursor2 = execute("""SELECT
+  user.user_first_name,
+  user.user_last_name,
+  COUNT(1) AS number_of_vehicles,
+  SUM(vehicle.sales_price) AS total_sales
+FROM vehicle
+LEFT JOIN sale
+ON vehicle.vin=sale.vin
+LEFT JOIN user
+ON sale.login_username=user.login_username
+WHERE
+  DATE_FORMAT(sales_date, '%Y-%m')='2019-06'
+GROUP BY 
+ user.login_username
+ORDER BY
+ number_of_vehicles DESC,
+ total_sales DESC;
+    """)
+    return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
 
 
 
