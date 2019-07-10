@@ -198,7 +198,7 @@ ORDER BY
 
 @app.route('/report/inventoryage', methods=['GET'])
 def get_InventoryAge():
-    cursor.execute("""SELECT
+  cursor.execute("""SELECT
   vehicle_type.vehicle_type,
   COALESCE(a.min_age, 'N/A') AS min_age,
   COALESCE(a.avg_age, 'N/A') AS avg_age,
@@ -222,6 +222,105 @@ on vehicle_type.vehicle_type=a.vehicle_type;
   """)
     data = cursor.fetchall()
     return render_template("display_inventory_age_table.html", data=data)
+
+
+@app.route('/report/averagetimeininventory', methods=['GET'])
+def get_AvgTimeInInventory():
+    cursor.execute("""SELECT
+  vehicle_type.vehicle_type,
+  COALESCE(a.min_age, 'N/A') AS min_age,
+  COALESCE(a.avg_age, 'N/A') AS avg_age,
+  COALESCE(a.max_age, 'N/A') AS max_age
+FROM vehicle_type 
+LEFT JOIN 
+(SELECT
+  vehicle_type, 
+  MIN(DATEDIFF(sales_date, purchase_date)) AS min_age, 
+  AVG(DATEDIFF(sales_date, purchase_date)) AS avg_age,
+  MAX(DATEDIFF(sales_date, purchase_date)) AS max_age
+FROM vehicle 
+LEFT JOIN purchase
+ON vehicle.vin=purchase.vin
+LEFT JOIN sale
+ON vehicle.vin=sale.vin
+WHERE 
+  sales_date IS NOT NULL -- only for sold vehicles
+GROUP BY vehicle_type) AS a
+ON a.vehicle_type=vehicle_type.vehicle_type;
+    """)
+    data = cursor.fetchall()
+    return render_template("display_avg_time_in_inventory_table.html", data=data)
+
+
+
+@app.route('/report/priceperrepair', methods=['GET'])
+def get_PricePerRepair():
+    cursor.execute("""SELECT
+  vehicle_type,
+  AVG(CASE WHEN vehicle_condition='Excellent' THEN kbb_value ELSE 0 END) AS 'Condition=Excellent',
+  AVG(CASE WHEN vehicle_condition='Very Good' THEN kbb_value ELSE 0 END) AS 'Condition=Very Good',
+  AVG(CASE WHEN vehicle_condition='Good' THEN kbb_value ELSE 0 END) AS 'Condition=Good',
+  AVG(CASE WHEN vehicle_condition='Fair' THEN kbb_value ELSE 0 END) AS 'Condition=Fair'
+FROM vehicle
+GROUP BY vehicle_type;
+    """)
+    data = cursor.fetchall()
+    return render_template("display_price_per_repair_table.html", data=data)
+
+
+
+@app.route('/report/repairstatistics', methods=['GET'])
+def get_RepairStats():
+    cursor.execute("""SELECT
+  vendor_name,
+  COUNT(*) AS number_of_repairs, 
+  SUM(total_cost) AS total_spend,
+  COUNT(distinct vin) AS number_of_vehicles,
+  AVG(DATEDIFF(repair_end_date, repair_start_date)) AS avg_duration
+FROM repair
+WHERE
+  repair_status='Complete'
+GROUP BY vendor_name;
+    """)
+    data = cursor.fetchall()
+    return render_template("display_repair_stats_table.html", data=data)
+
+
+
+@app.route('/report//monthlysales', methods=['GET'])
+def get_MonthlySales():
+    cursor.execute("""SELECT 
+  DATE_FORMAT(sales_date, '%Y-%m') as ym,
+  COUNT(1) AS number_of_vehicles,
+  SUM(sales_price) AS sales_revenue,
+  SUM(sales_price - repair_cost - kbb_value) AS net_income
+FROM
+(SELECT 
+ vehicle.vin,
+ sale.sales_date,
+ vehicle.sales_price,
+ vehicle.kbb_value,
+ repair_total_cost_by_vin.total_cost AS repair_cost 
+FROM vehicle
+LEFT JOIN sale
+ON vehicle.vin=sale.vin
+LEFT JOIN (
+SELECT
+  repair.vin,
+  SUM(repair.total_cost) AS total_cost
+FROM repair
+GROUP BY vin
+) as repair_total_cost_by_vin
+ON repair_total_cost_by_vin.vin=vehicle.vin
+WHERE 
+  sale.sales_date IS NOT NULL) as a  -- vehicle must be sold
+GROUP BY ym
+order by ym DESC;
+    """)
+    data = cursor.fetchall()
+    return render_template("display_monthly_sales_table.html", data=data)
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)

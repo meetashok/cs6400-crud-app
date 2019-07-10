@@ -2,14 +2,15 @@
 {% block content %}
 <!-- Page Content -->
 <div class="container">
-  <h1 class="mt-4">Inventory Age Report!</h1>
+  <h1 class="mt-4">Repair Statistics Report!</h1>
   <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">Vehicle Type</th>
-      <th scope="col">Minimum Age</th>
-      <th scope="col">Avg Age</th>
-      <th scope="col">Maximum Age</th>
+      <th scope="col">Vendor Name</th>
+      <th scope="col">Number Of Repairs</th>
+      <th scope="col">Total Spend</th>
+      <th scope="col">Number Of Vehicles</th>
+      <th scope="col">Average Duration</th>
     </tr>
   </thead>
   <tbody>
@@ -19,6 +20,7 @@
 	    <td>{{item[1]}}</td>
 	    <td>{{item[2]}}</td>
 	    <td>{{item[3]}}</td>
+      <td>{{item[4]}}</td>
 	</tr>
 	{% endfor %}
   </tbody>
