@@ -129,5 +129,69 @@ def dropdown():
     if form.validate_on_submit():
         return render_template('test.html', colours=colours)
 
+@app.route('/reoport/sellerhistory', methods=['GET'])
+def get_SellerHistory():
+    cursor.execute("""SELECT 
+  customer_id,
+  customer_name,
+  COUNT(*) AS vehicles_sold,
+  AVG(purchase_price) AS avg_purchase_price,
+  AVG(number_of_repairs) AS avg_number_of_repairs
+FROM
+(SELECT
+  customer.customer_id,
+  individual.individual_first_name + " " + individual.individual_last_name AS customer_name,
+  vehicle.vin,
+  a.number_of_repairs,
+  vehicle.kbb_value AS purchase_price
+FROM vehicle
+LEFT JOIN purchase
+ON vehicle.vin=purchase.vin
+LEFT JOIN customer
+ON purchase.customer_id=customer.customer_id
+LEFT JOIN individual
+ON customer.customer_id=individual.customer_id
+LEFT JOIN 
+(SELECT 
+  vin,
+  COUNT(1) AS number_of_repairs
+FROM repair
+GROUP BY vin) a
+ON vehicle.vin=a.vin
+WHERE 
+  individual.individual_first_name IS NOT NULL
+  
+UNION ALL
+
+SELECT 
+  customer.customer_id,
+  business.business_name AS customer_name,
+  vehicle.vin,
+  a.number_of_repairs,
+  vehicle.kbb_value AS purchase_price
+FROM vehicle
+LEFT JOIN purchase
+ON vehicle.vin=purchase.vin
+LEFT JOIN customer
+ON purchase.customer_id=customer.customer_id
+LEFT JOIN business
+ON customer.customer_id=business.customer_id
+LEFT JOIN 
+(SELECT 
+  vin,
+  COUNT(1) AS number_of_repairs
+FROM repair
+GROUP BY vin) a
+ON vehicle.vin=a.vin
+WHERE 
+  business.business_name IS NOT NULL) b
+GROUP BY customer_id, customer_name
+ORDER BY
+  vehicles_sold DESC,
+  avg_purchase_price ASC;
+""")
+    data = cursor.fetchall()
+    return render_template("display_seller_history_table.html", data=data)
+
 if __name__ == "__main__":
     app.run(debug=True)
