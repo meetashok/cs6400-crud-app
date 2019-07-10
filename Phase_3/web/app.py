@@ -2,6 +2,7 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
+from flask_wtf import FlaskForm
 
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
@@ -22,45 +23,7 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-
-# Create forms
-class IndividualForm(FlaskForm):
-    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
-    email = StringField("Email address")
-    street = StringField("Street", validators=[validators.DataRequired()])
-    city = StringField("City", validators=[validators.DataRequired()])
-    state = StringField("State", validators=[validators.DataRequired()])
-    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
-
-    # driver_license_number = StringField("Driver license number", validators=[validators.DataRequired()])
-    # individual_first_name = StringField("First name", validators=[validators.DataRequired()])
-    # individual_last_name = StringField("Last name", validators=[validators.DataRequired()])
-    submit = SubmitField("Send")
-
-class BusinessForm(FlaskForm):
-    phone_number = StringField("Phone number", validators=[validators.DataRequired()])
-    email = StringField("Email address", validators=[])
-    street = StringField("Street", validators=[validators.DataRequired()])
-    city = StringField("City", validators=[validators.DataRequired()])
-    state = StringField("State", validators=[validators.DataRequired()])
-    postal_code = StringField("Postal code", validators=[validators.DataRequired()])
-
-    tax_id_number = StringField("Business tax ID", validators=[validators.DataRequired()])
-    business_name = StringField("Business name", validators=[validators.DataRequired()])
-    pc_name = StringField("Primary contact name", validators=[validators.DataRequired()])
-    pc_title = StringField("Primary contact title", validators=[validators.DataRequired()])
-
-
-class SearchForm(FlaskForm):
-    vehicle_type = StringField("Vehicle Type", validators=[])
-    manufacturer_name = StringField("Manufacturer Type", validators=[])
-    color = StringField("Color", validators=[])
-    model_year = StringField("Model Year", validators=[])
-    keyword = StringField("Keyword Search", validators=[])
-
-
-# class RepairForm(FlaskForm):
-#     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
+# cursor = mysql.connection.cursor()
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
@@ -268,16 +231,16 @@ def dropdown():
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT 
-  customer_id,
   customer_name,
   COUNT(*) AS vehicles_sold,
-  AVG(purchase_price) AS avg_purchase_price,
-  AVG(number_of_repairs) AS avg_number_of_repairs
+  ROUND(AVG(purchase_price),2) AS avg_purchase_price,
+  COALESCE(ROUND(AVG(number_of_repairs),2),0) AS avg_number_of_repairs
 FROM
 (SELECT
   customer.customer_id,
-  individual.individual_first_name + " " + individual.individual_last_name AS customer_name,
+  CONCAT(individual.individual_first_name," ",individual.individual_last_name) AS customer_name,
   vehicle.vin,
   a.number_of_repairs,
   vehicle.kbb_value AS purchase_price
@@ -332,6 +295,7 @@ ORDER BY
 
 @app.route('/report/inventoryage', methods=['GET'])
 def get_InventoryAge():
+  cursor = mysql.connection.cursor()
   cursor.execute("""SELECT
   vehicle_type.vehicle_type,
   COALESCE(a.min_age, 'N/A') AS min_age,
@@ -360,6 +324,7 @@ on vehicle_type.vehicle_type=a.vehicle_type;
 
 @app.route('/report/averagetimeininventory', methods=['GET'])
 def get_AvgTimeInInventory():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vehicle_type.vehicle_type,
   COALESCE(a.min_age, 'N/A') AS min_age,
@@ -389,6 +354,7 @@ ON a.vehicle_type=vehicle_type.vehicle_type;
 
 @app.route('/report/priceperrepair', methods=['GET'])
 def get_PricePerRepair():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vehicle_type,
   AVG(CASE WHEN vehicle_condition='Excellent' THEN kbb_value ELSE 0 END) AS 'Condition=Excellent',
@@ -405,6 +371,7 @@ GROUP BY vehicle_type;
 
 @app.route('/report/repairstatistics', methods=['GET'])
 def get_RepairStats():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   vendor_name,
   COUNT(*) AS number_of_repairs, 
@@ -423,6 +390,7 @@ GROUP BY vendor_name;
 
 @app.route('/report//monthlysales', methods=['GET'])
 def get_MonthlySales():
+    cursor = mysql.connection.cursor()
     cursor.execute("""SELECT 
   DATE_FORMAT(sales_date, '%Y-%m') as ym,
   COUNT(1) AS number_of_vehicles,
@@ -452,7 +420,26 @@ GROUP BY ym
 order by ym DESC;
     """)
     data = cursor.fetchall()
-    return render_template("display_monthly_sales_table.html", data=data)
+    cursor2 = mysql.connection.cursor()
+    cursor2 = execute("""SELECT
+  user.user_first_name,
+  user.user_last_name,
+  COUNT(1) AS number_of_vehicles,
+  SUM(vehicle.sales_price) AS total_sales
+FROM vehicle
+LEFT JOIN sale
+ON vehicle.vin=sale.vin
+LEFT JOIN user
+ON sale.login_username=user.login_username
+WHERE
+  DATE_FORMAT(sales_date, '%Y-%m')='2019-06'
+GROUP BY 
+ user.login_username
+ORDER BY
+ number_of_vehicles DESC,
+ total_sales DESC;
+    """)
+    return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
 
 
 
