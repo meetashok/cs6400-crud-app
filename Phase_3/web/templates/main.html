@@ -4,8 +4,7 @@
 <!-- Page Content -->
 <div class="container">
   <h1 class="mt-4">Search</h1>
-  <p>Burdell home page (<b>{{ vin }}</b>)...</p>
-  <p>{{ confirm }}</p>
+  <p>Burdell home page</p>
   <table class="table table-striped">
   <thead>
     <tr>
@@ -14,7 +13,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for item in repair_data %}
+    {% for item in vehicle_data %}
     <tr>
       <td>{{item[0]}}</td>
 
@@ -31,6 +30,27 @@
         <input class="btn btn-default" type="submit" value="Login">
       </form>
   </p>
+      <!--
+    <form action="" method="POST">
+        {{ form.csrf_token }}        
+        {{ form.vehicle_type.label }} 
+        {{ form.vehicle_type }} 
+        <br>
+        {{ form.manufacturer_name.label }} 
+        {{ form.manufacturer_name }} 
+        <br>
+        {{ form.color.label }} 
+        {{ form.color }} 
+        <br>
+        {{ form.model_year.label }} 
+        {{ form.model_year }} 
+        <br>
+        {{ form.keyword.label }} 
+        {{ form.keyword }} 
+        <br>
+        {{ form.submit }}
+    </form>
+    -->
   <div class="collapse" id="collapseExample">
     <div class="card card-body">
       <form action="/" method="POST">

@@ -49,12 +49,21 @@ class BusinessForm(FlaskForm):
     pc_name = StringField("Primary contact name", validators=[validators.DataRequired()])
     pc_title = StringField("Primary contact title", validators=[validators.DataRequired()])
 
+
+class SearchForm(FlaskForm):
+    vehicle_type = StringField("Vehicle Type", validators=[])
+    manufacturer_name = StringField("Manufacturer Type", validators=[])
+    color = StringField("Color", validators=[])
+    model_year = StringField("Model Year", validators=[])
+    keyword = StringField("Keyword Search", validators=[])
+
+
 # class RepairForm(FlaskForm):
 #     vendor_name = StringField("Vendor name", validators[validators.DataRequired()])
 
-# use decorators to link the function to a url
-@app.route('/', methods=["GET", "POST"])
-def welcome(query="DEFAULT"):
+# main page with vehicle count, login, and search
+@app.route('/', methods=['GET', 'POST'])
+def main(query="DEFAULT"):
     cursor = mysql.connection.cursor()
     cursor.execute(("""SELECT
       count(vehicle.vin) as vehicles_available
@@ -73,9 +82,46 @@ WHERE
   vehicle_in_repair.vin IS NULL AND
   sale.sales_date IS NULL;"""),)
     vehicle_data = cursor.fetchall()
-    mysql.connection.commit()  
-    return render_template('main.html', vehicle_data=vehicle_data, query=query)  # render a template
+    mysql.connection.commit() 
 
+    error = None
+    if request.method == 'POST':
+        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
+            error = 'Invalid Credentials. Please try again.'
+        else:
+          return redirect(url_for('main'))  ###here will use separate authenticated main pages?
+
+    return render_template('main.html', vehicle_data=vehicle_data, query=query, error=error)  # render a template
+"""
+def search():
+    form = SearchForm()
+    if request.method == "GET":
+        return render_template('main.html', form=form)
+
+    if request.method == "POST":
+        if form.validate() == True:
+            vehicle_type = form.vehicle_type.data
+            manufacturer_name = form.manufacturer_name.data
+            color = form.color.data
+            model_year = form.model_year.data
+            keyword = form.keyword.data
+
+            
+            cursor = mysql.connection.cursor()
+            query2 = "SELECT * FROM vehicle"
+            #variables = vehicle_type, manufacturer_name, color, model_year, keyword
+            cursor.execute((query, variables))
+            mysql.connection.commit()
+            # return render_template('welcome.html', query="query")
+            return redirect(url_for("main"))
+
+        else:
+            return render_template('main.html', form=form)
+""" 
+
+
+
+"""
 # route decorator for login page logic
 @app.route('/login', methods=['GET','POST'])
 def login():
@@ -86,7 +132,7 @@ def login():
       else:
         return redirect(url_for('home'))
   return render_template('login.html', error=error)
-
+"""
 
 
 
