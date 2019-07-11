@@ -118,29 +118,29 @@ def logout():
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
-    form = RepairForm()
-    if request.method == "GET":
+  form = RepairForm()
+  if request.method == "GET":
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM repair WHERE vin = %s", [vin])
+    repair_data = cursor.fetchall()
+    mysql.connection.commit()
+    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
+   
+  if request.method == "POST":
+    if form.validate() == True:
       cursor = mysql.connection.cursor()
-      cursor.execute("SELECT * FROM repair WHERE vin = %s", [vin])
-      repair_data = cursor.fetchall()
+      repair_status = "Pending"
+      query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+      nhtsa_recall_number = form.nhtsa_recall_number.data
+      if form.nhtsa_recall_number.data == "":
+        nhtsa_recall_number = None
+      parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
+      print((query,parameters), file=sys.stderr)
+      cursor.execute(query, parameters)
       mysql.connection.commit()
+      return redirect(url_for("repairs", vin=vin))
+    else:
       return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
-     
-    if request.method == "POST":
-      if form.validate() == True:
-        cursor = mysql.connection.cursor()
-        repair_status = "Pending"
-        query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        nhtsa_recall_number = form.nhtsa_recall_number.data
-        if form.nhtsa_recall_number.data == "":
-          nhtsa_recall_number = None
-        parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
-        print((query,parameters), file=sys.stderr)
-        cursor.execute(query, parameters)
-        mysql.connection.commit()
-        return redirect(url_for("repairs", vin=vin))
-      else:
-        return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual(previous_page=None):
