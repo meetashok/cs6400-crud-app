@@ -35,7 +35,6 @@ class IndividualForm(FlaskForm):
     driver_license_number = StringField("Driver license number", validators=[DataRequired()])
     individual_first_name = StringField("First name", validators=[DataRequired()])
     individual_last_name = StringField("Last name", validators=[DataRequired()])
-    submit = SubmitField("Save")
 
 class BusinessForm(FlaskForm):
     phone_number = StringField("Phone number", validators=[DataRequired()])
