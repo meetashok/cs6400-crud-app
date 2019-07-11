@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block content %}
+
+<div class="container">
+    {{ session }}
+        <div class="card w-75">
+                <div class="card-body">
+                  <h5 class="card-title">Customer Information</h5>
+                  {% if customer_type %}
+                    <p class="card-text">Type: {{ session.buyer.customer_type }}</p>
+                  {% endif %}
+        
+                  {% if customer_name %}
+                    <p class="card-text">Name: {{ session.buyer.customer_name }}</p>
+                  {% endif %}          
+                  <a class="btn btn-primary" href="{{ '/searchcustomer' }}" >Search customer</a>
+                  <a class="btn btn-primary" href="{{ url_for('addindividual', previous_page='sell') }}" >Add individual</a>
+                  <a class="btn btn-primary" href="{{ url_for('addbusiness', previous_page='sell') }}" >Add business</a>
+        
+                </div>
+        </div>
+        <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">VIN</th>
+                        <td>{{ vehicle_data.vin }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Manufacturer</th>
+                        <td>{{ vehicle_data.manufacturer_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Vehicle type</th>
+                        <td>{{ vehicle_data.vehicle_type }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Model</th>
+                        <td>{{ vehicle_data.model_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">year</th>
+                        <td>{{ vehicle_data.model_year }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Mileage</th>
+                        <td>{{ vehicle_data.mileage }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Sales Price</th>
+                        <td>{{ vehicle_data.sales_price }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">VIN</th>
+                        <td>{{ vehicle_data.vin }}</td>
+                    </tr>      
+                </tbody>
+              </table>
+
+
+</div>
+{% endblock %}

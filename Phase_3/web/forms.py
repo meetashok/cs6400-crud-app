@@ -68,3 +68,10 @@ class RepairForm(FlaskForm):
     nhtsa_recall_number = StringField("NHTSA recall number")
     total_cost = FloatField("Repair cost", validators=[DataRequired()])
     repair_description = StringField("Description", validators=[DataRequired()])
+
+class ManufacturerForm(FlaskForm):
+    manufacturer_name = StringField("Manufacturer name", validators=[DataRequired()])
+    submit = SubmitField("Save")
+
+class VehicleTypeForm(FlaskForm):
+    vehicle_type = StringField("Vehicle type", validators=[DataRequired()])
