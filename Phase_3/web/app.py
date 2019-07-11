@@ -3,12 +3,13 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
 import sys
-import sql.sql_codes as sql
-# NOTE usage: sql.queries
+
+# import sql templating class
+from  sql.sql import QueryDB
+sql = QueryDB()
 
 # create the application object
 app = Flask(__name__)
@@ -17,82 +18,75 @@ app.secret_key = 'development key'
 
 # create the connection to MySQL
 mysql = MySQL(app)
-
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# cursor = mysql.connection.cursor()
-session = {}
+# setup session dictionary for user authentication
+session = {
+  "authenticated":False,
+  "username":"guest",
+  "role": None
+}
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
-########Count of vehicles for sale
 def main():
-    cursor = mysql.connection.cursor()
-    cursor.execute(("""SELECT
-      count(vehicle.vin) as vehicles_available
-FROM vehicle 
-LEFT JOIN
-(
-  SELECT
-    distinct(vin)  as vin
-  FROM repair
-  WHERE repair_status IN ('In Progress','Pending')
-) vehicle_in_repair 
-ON vehicle.vin=vehicle_in_repair.vin
-LEFT JOIN sale
-  ON vehicle.vin=sale.vin
-WHERE 
-  vehicle_in_repair.vin IS NULL AND
-  sale.sales_date IS NULL;"""),)
-    vehicle_data = cursor.fetchall()
-    mysql.connection.commit() 
-    return render_template('main.html', vehicle_data=vehicle_data)  # render main template
+  print("session:",session,file=sys.stderr)
+  cursor = mysql.connection.cursor()
+  # count of vehicles for sale
+  cursor.execute(sql.count_vehicles_available)
+  count_vehicles_available = cursor.fetchone()
+  print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
+  if count_vehicles_available:
+    count_vehicles_available = count_vehicles_available[0]
+  return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
 
-########Login section
+# login handler
 @app.route('/login', methods=['POST'])
 def login():
   # Output message if something goes wrong...
   msg = ''
   # Check if "username" and "password" POST requests exist (user submitted form)
   if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-      # Create variables for easy access
-      username = request.form['username']
-      password = request.form['password']
-      # Check if account exists using MySQL
-      cursor = mysql.connection.cursor()
-      cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
-      # Fetch one record and return result
-      user = cursor.fetchone()
-      print(user, file=sys.stderr)
-      print(user[0], file=sys.stderr)
-      print(user[1], file=sys.stderr)
-      print(user[2], file=sys.stderr)
-      # If account exists in accounts table in out database
-      if user[1] == password:
-          # Create session data, we can access this data in other routes
-          session['loggedin'] = True
-          #session['id'] = user['id']
-          session['username'] = username
-          # Redirect to home page
-          return 'Logged in successfully!'
-      else:
-          # Account doesnt exist or username/password incorrect
-          msg = 'Incorrect username/password!'
-          return msg
+    # Create variables for easy access
+    username = request.form['username']
+    password = request.form['password']
+    # Check if account exists using MySQL
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
+    # cursor.execute(sql.check_login_username_and_password(username, password))
+    # Fetch one record and return result
+    user = cursor.fetchone()
+    print("user:",user, file=sys.stderr)
+    if user:
+      print("login_username:",user[0], file=sys.stderr)
+      print("login_password:",user[1], file=sys.stderr)
+      print("role:",user[2], file=sys.stderr)
+    # If account exists in accounts table in out database
+    if user and user[1] == password:
+      # Create session data, we can access this data in other routes
+      session["authenticated"] = True
+      session["username"] = user[0]
+      session["role"] = user[2] 
+      msg = 'Logged in successfully!'
+    else:
+      # Account doesnt exist or username/password incorrect
+      msg = 'Incorrect username/password!'
   # Show the login form with message (if any)
-  return render_template('main.html', msg=msg)    
-######Logout section (need a button?)
-def logout():
-  # Remove session data, this will log the user out
-  session.pop('loggedin', None)
-  session.pop('id', None)
-  session.pop('username', None)
-  # Redirect to login page
   return redirect(url_for('main'))  
+
+# logout handler
+@app.route('/logout', methods=['POST'])
+def logout():
+  # remove session data, this will log the user out
+  session["authenticated"] = False
+  session["username"] = "guest"
+  session["role"] = None
+  return redirect(url_for('main'))  
+
 ### ##########Search form section
 ### def search():
 ###     form = SearchForm()
