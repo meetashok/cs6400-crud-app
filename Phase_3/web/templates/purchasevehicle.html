@@ -5,17 +5,31 @@
 
 <div class="container">
     
-      
+       
 <div class="card card-body">
     <ul class="list-group">
         {% for error in errors %}
           <li class="list-group-item list-group-item-danger">{{error}}</li>
         {% endfor %}
     </ul>
+    
+    <div class="card w-75">
+        <div class="card-body">
+          <h5 class="card-title">Customer Information</h5>
+          {% if customer_type %}
+            <p class="card-text">Type: {{ customer_type }}</p>
+          {% endif %}
 
-    <a class="btn btn-primary" href="{{ '/searchcustomer' }}" role="button">Search customer</a>
-    <a class="btn btn-primary" href="{{ '/addindividual' }}" role="button">Add customer</a>
+          {% if customer_name %}
+            <p class="card-text">Name: {{ customer_name }}</p>
+          {% endif %}          
+          <a class="btn btn-primary" href="{{ '/searchcustomer' }}" >Search customer</a>
+          <a class="btn btn-primary" href="{{ url_for('addindividual', previous_page='purchase') }}" >Add individual</a>
+          <a class="btn btn-primary" href="{{ url_for('addbusiness', previous_page='purchase') }}" >Add business</a>
 
+        </div>
+      </div>
+    
     <form action="/purchasevehicle" method="POST">
       <div class="form-group">
         <label for="vin">VIN</label>
