@@ -11,9 +11,17 @@
       <th scope="col">Sales Revenue</th>
       <th scope="col">Net Income</th>
     </tr>
+    {% for item in data %}
+    <tr>
+      <td>{{item[0]}}</td>
+      <td>{{item[1]}}</td>
+      <td>{{item[2]}}</td>
+      <td>{{item[3]}}</td>
+    </tr>
+    {% endfor %}
   </thead>
-  <tbody>
-	{% for item in data %}
+  <tbody class="collapsed">
+	{% for item in data_drilldown %}
 	<tr>
 	    <td>{{item[0]}}</td>
 	    <td>{{item[1]}}</td>
@@ -24,4 +32,9 @@
   </tbody>
   </table>
 </div>
+<script type="text/javascript">
+$('thead').on('click', function(){
+    $(this).next('tbody').toggleClass('collapsed');
+});
+</script>
 {% endblock %}
