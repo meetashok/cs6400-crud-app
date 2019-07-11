@@ -30,7 +30,8 @@ app.config['MYSQL_PORT'] = 3306
 session = {
   "authenticated":False,
   "username":"guest",
-  "role": None
+  "role": None,
+  "previous_page": None,
 }
 
 # main page with vehicle count, login, and search
@@ -119,13 +120,15 @@ def logout():
 # @login_required
 def repairs(vin="BLANK"):
   form = RepairForm()
+  # show repairs info for vin
   if request.method == "GET":
     cursor = mysql.connection.cursor()
-    cursor.execute("SELECT * FROM repair WHERE vin = %s", [vin])
+    cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
     mysql.connection.commit()
     return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
    
+  # add new repair info for vin
   if request.method == "POST":
     if form.validate() == True:
       cursor = mysql.connection.cursor()

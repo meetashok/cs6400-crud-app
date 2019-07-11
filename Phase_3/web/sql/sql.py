@@ -39,6 +39,16 @@ class QueryDB:
         login_password = %s
     """
 # }}}
+# {{{ repairs_show_repairs()
+  @property
+  def repairs_show_repairs(self):
+    return """
+     SELECT 
+       vin, repair_start_date, repair_end_date, vendor_name, nhtsa_recall_number, total_cost, repair_description, repair_status
+     FROM repair 
+     WHERE vin = %s
+    """
+# }}}
 # {{{ reports_seller_history()
   @property
   def reports_seller_history(self):
