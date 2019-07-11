@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
+from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm, ManufacturerForm, VehicleTypeForm
 
 # import sql templating class
 from  sql.sql import QueryDB
@@ -26,7 +26,7 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# setup session dictionary for user authentication
+# setup session dictionary for user authentication and other session related variables
 session = {
   "authenticated":False,
   "username":"guest",
@@ -229,6 +229,25 @@ def addvendor():
             return redirect(url_for("main"))
         else:
             return render_template('addvendor.html', form=form)
+
+
+@app.route("/addmanufacturer", methods=['GET', 'POST'])
+def add_manufacturer(previous_page=None):
+    form = ManufacturerForm()
+    if request.method == "GET":
+        return render_template('addmanufacturer.html', form=form)
+    if request.method == "POST":
+        if form.validate() == True:
+            cursor = mysql.connection.cursor()
+            query = "INSERT INTO manufacturer (manufacturer_name) VALUES (%s)"
+            variables = [form.manufacturer_name.data]
+            cursor.execute(query, variables)
+            mysql.connection.commit()
+            print("testing", file=sys.stderr)
+            return redirect(url_for("main"))
+        else:
+            return render_template('addmanufacturer.html', form=form)
+
 
 @app.route("/purchasevehicle", methods=["GET", "POST"])
 def purchasevehicle():
