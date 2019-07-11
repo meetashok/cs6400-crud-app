@@ -7,6 +7,8 @@ from flask_wtf import FlaskForm
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
 import sql.sql_codes as sql
+import sys
+import datetime
 # NOTE usage: sql.queries
 
 # create the application object
@@ -195,22 +197,39 @@ def addvendor():
 
 @app.route("/purchasevehicle", methods=["GET", "POST"])
 def purchasevehicle():
+      errors = []
+
       cursor = mysql.connection.cursor()
-      form = VehicleForm()
-      form.manufacturer_name.choices = ["bmw", "honda"]
-      form.vehicle_type.choices = ["suv", "sedan"]
-      form.model_year.choices = [1900, 1901]
+      cursor.execute("SELECT manufacturer_name from manufacturer")
+      manufacturer_names = [record[0] for record in cursor.fetchall()]
+      
+      cursor.execute("SELECT vehicle_type from vehicle_type")
+      vehicle_types = [record[0] for record in cursor.fetchall()]
+
+      colors = ['Aluminum', 'Beige', 'Black', 'Blue', 'Brown', 'Bronze', 'Claret', 'Copper', 
+      'Cream', 'Gold', 'Gray', 'Green', 'Maroon', 'Metallic', 'Navy', 'Orange', 'Pink', 
+      'Purple', 'Red', 'Rose', 'Rust', 'Silver', 'Tan', 'Turquoise', 'White', 'Yellow']
+
+      vehicle_conditions = ["Excellent", "Very Good", "Good", "Fair"]
+      
+      current_year = datetime.datetime.now().year
+
       if request.method == "GET":
-            render_template("purchasevehicle.html", form=form)
+          return render_template("purchasevehicle.html", manufacturer_names=manufacturer_names,
+          vehicle_types=vehicle_types, colors=colors, vehicle_conditions=vehicle_conditions, errors=errors)
       if request.method == "POST":
-            if form.validate() == True:
-                  cursor = mysql.connection.cursor()
-                  query = "INSERT INTO vehicle (vin, manufacturer_name, vehicle_type, model_year, model_name, mileage, vehicle_condition, vehicle_description, sales_price, kbb_value) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" 
-                  sales_price = float(form.kbb_value.data) * 1.25
-                  parameters = [form.vin.data, form.manufacturer_name.data, form.vehicle_type.data, form.model_year.data, 
-                  form.model_name.data, form.vehicle_condition.data, form.vehicle_description.data, sales_price, form.kbb_value.data]
-                  cursor.execute(query, parameters)
-                  mysql.connection.commit()
+          vin = request.form.get("vin")
+          manufacturer_name = request.form.get("manufacturer_name")
+          vehicle_type = request.form.get("vehicle_type")
+          model_year = request.form.get("model_year")
+          model_name = request.form.get("model_name")
+          mileage = request.form.get("mileage")
+          vehicle_condition = request.form.get("vehicle_condition")
+          vehicle_description = request.form.get("vehicle_description")
+          kbb_value = request.form.get("kbb_value")
+          colors = request.form.getlist("colors")
+
+          return "Done"
       
 
 @app.route("/searchcustomer", methods=["GET", "POST"])
