@@ -26,7 +26,7 @@ app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# setup session dictionary for user authentication
+# setup session dictionary for user authentication and other session related variables
 session = {
   "authenticated":False,
   "username":"guest",
