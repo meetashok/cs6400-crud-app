@@ -58,8 +58,8 @@ def login():
     password = request.form['password']
     # Check if account exists using MySQL
     cursor = mysql.connection.cursor()
-    cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
-    # cursor.execute(sql.check_login_username_and_password(username, password))
+    print("sql.check_login_username_and_password,(username, password):",sql.check_login_username_and_password,(username, password),file=sys.stderr)
+    cursor.execute(sql.check_login_username_and_password,(username, password))
     # Fetch one record and return result
     user = cursor.fetchone()
     print("user:",user, file=sys.stderr)
@@ -474,4 +474,4 @@ ORDER BY
     return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+  app.run(debug=True)
