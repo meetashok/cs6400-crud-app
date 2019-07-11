@@ -1,99 +1,97 @@
-# import the Flask class from the flask module
+# import Flask with dependecies
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
-import sys
-import sql.sql_codes as sql
+# import sql templating class
+from  sql.sql import QueryDB
+sql = QueryDB()
+
+# import misc python modules
 import sys
 import datetime
-# NOTE usage: sql.queries
 
-# create the application object
+# instantiate Flask app
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 app.secret_key = 'development key'
 
-# create the connection to MySQL
+# build connection to MySQL
 mysql = MySQL(app)
-
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# cursor = mysql.connection.cursor()
+# setup session dictionary for user authentication
+session = {
+  "authenticated":False,
+  "username":"guest",
+  "role": None,
+  "previous_page": None,
+  "buyer": {},
+  "seller": {}
+}
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
-########Count of vehicles for sale
 def main():
-    cursor = mysql.connection.cursor()
-    cursor.execute(("""SELECT
-      count(vehicle.vin) as vehicles_available
-FROM vehicle 
-LEFT JOIN
-(
-  SELECT
-    distinct(vin)  as vin
-  FROM repair
-  WHERE repair_status IN ('In Progress','Pending')
-) vehicle_in_repair 
-ON vehicle.vin=vehicle_in_repair.vin
-LEFT JOIN sale
-  ON vehicle.vin=sale.vin
-WHERE 
-  vehicle_in_repair.vin IS NULL AND
-  sale.sales_date IS NULL;"""),)
-    vehicle_data = cursor.fetchall()
-    mysql.connection.commit() 
-    return render_template('main.html', vehicle_data=vehicle_data)  # render main template
+  print("session:",session,file=sys.stderr)
+  cursor = mysql.connection.cursor()
+  # count of vehicles for sale
+  cursor.execute(sql.count_vehicles_available)
+  count_vehicles_available = cursor.fetchone()
+  print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
+  if count_vehicles_available:
+    count_vehicles_available = count_vehicles_available[0]
+  return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
 
-########Login section
+# login handler
 @app.route('/login', methods=['POST'])
 def login():
   # Output message if something goes wrong...
   msg = ''
   # Check if "username" and "password" POST requests exist (user submitted form)
   if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-      # Create variables for easy access
-      username = request.form['username']
-      password = request.form['password']
-      # Check if account exists using MySQL
-      cursor = mysql.connection.cursor()
-      cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
-      # Fetch one record and return result
-      user = cursor.fetchone()
-      print(user, file=sys.stderr)
-      print(user[0], file=sys.stderr)
-      print(user[1], file=sys.stderr)
-      print(user[2], file=sys.stderr)
-      # If account exists in accounts table in out database
-      if user[1] == password:
-          # Create session data, we can access this data in other routes
-          session['loggedin'] = True
-          #session['id'] = user['id']
-          session['username'] = username
-          # Redirect to home page
-          return 'Logged in successfully!'
-      else:
-          # Account doesnt exist or username/password incorrect
-          msg = 'Incorrect username/password!'
-          return msg
+    # Create variables for easy access
+    username = request.form['username']
+    password = request.form['password']
+    # Check if account exists using MySQL
+    cursor = mysql.connection.cursor()
+    print("sql.check_login_username_and_password,(username, password):",sql.check_login_username_and_password,(username, password),file=sys.stderr)
+    cursor.execute(sql.check_login_username_and_password,(username, password))
+    # Fetch one record and return result
+    user = cursor.fetchone()
+    print("user:",user, file=sys.stderr)
+    if user:
+      print("login_username:",user[0], file=sys.stderr)
+      print("login_password:",user[1], file=sys.stderr)
+      print("role:",user[2], file=sys.stderr)
+    # If account exists in accounts table in out database
+    if user and user[1] == password:
+      # Create session data, we can access this data in other routes
+      session["authenticated"] = True
+      session["username"] = user[0]
+      session["role"] = user[2] 
+      msg = 'Logged in successfully!'
+    else:
+      # Account doesnt exist or username/password incorrect
+      msg = 'Incorrect username/password!'
   # Show the login form with message (if any)
-  return render_template('main.html', msg=msg)    
-######Logout section (need a button?)
-def logout():
-  # Remove session data, this will log the user out
-  session.pop('loggedin', None)
-  session.pop('id', None)
-  session.pop('username', None)
-  # Redirect to login page
   return redirect(url_for('main'))  
+
+# logout handler
+@app.route('/logout', methods=['POST'])
+def logout():
+  # remove session data, this will log the user out
+  session["authenticated"] = False
+  session["username"] = "guest"
+  session["role"] = None
+  return redirect(url_for('main'))  
+
 ### ##########Search form section
 ### def search():
 ###     form = SearchForm()
@@ -123,29 +121,31 @@ def logout():
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
-    form = RepairForm()
-    if request.method == "GET":
+  form = RepairForm()
+  # show repairs info for vin
+  if request.method == "GET":
+    cursor = mysql.connection.cursor()
+    cursor.execute(sql.repairs_show_repairs, [vin])
+    repair_data = cursor.fetchall()
+    mysql.connection.commit()
+    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
+   
+  # add new repair info for vin
+  if request.method == "POST":
+    if form.validate() == True:
       cursor = mysql.connection.cursor()
-      cursor.execute("SELECT * FROM repair WHERE vin = %s", [vin])
-      repair_data = cursor.fetchall()
+      repair_status = "Pending"
+      query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+      nhtsa_recall_number = form.nhtsa_recall_number.data
+      if form.nhtsa_recall_number.data == "":
+        nhtsa_recall_number = None
+      parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
+      print((query,parameters), file=sys.stderr)
+      cursor.execute(query, parameters)
       mysql.connection.commit()
+      return redirect(url_for("repairs", vin=vin))
+    else:
       return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
-     
-    if request.method == "POST":
-      if form.validate() == True:
-        cursor = mysql.connection.cursor()
-        repair_status = "Pending"
-        query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-        nhtsa_recall_number = form.nhtsa_recall_number.data
-        if form.nhtsa_recall_number.data == "":
-          nhtsa_recall_number = None
-        parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
-        print((query,parameters), file=sys.stderr)
-        cursor.execute(query, parameters)
-        mysql.connection.commit()
-        return redirect(url_for("repairs", vin=vin))
-      else:
-        return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual():
@@ -169,15 +169,15 @@ def addindividual():
             cursor.execute(query, variables)
             mysql.connection.commit()
             # print(previous_page, file=sys.stderr)
-            if session["previous_page"] == "purchase":
-              session["seller"] = {
+            session["seller"] = {
                 "customer_id": last_customer_id,
                 "customer_type": "Individual",
                 "customer_name": "{} {}".format(form.individual_first_name.data, form.individual_last_name.data)
               }
+            if session["previous_page"] == "purchase":
               return redirect(url_for("purchasevehicle"))
             else:
-              return "sales page - TBD"
+              return redirect(url_for("sellvehicle", vin="0KQT4QWDSFO183874"))
         else:
             return render_template('addindividual.html', form=form)
 
@@ -202,15 +202,15 @@ def addbusiness():
             variables = [form.tax_id_number.data, last_customer_id, form.business_name.data, form.pc_name.data, form.pc_title.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            if session["previous_page"] == "purchase":
-                session["seller"] = {
+            session["seller"] = {
                 "customer_id": last_customer_id,
-                "customer_type": "Business",
-                "customer_name": "{} {}".format(form.business_name.data)
+                "customer_type": "Individual",
+                "customer_name": "{}".format(form.business_name.data)
               }
-                return redirect(url_for("purchasevehicle"))
+            if session["previous_page"] == "purchase":
+              return redirect(url_for("purchasevehicle"))
             else:
-              return "sales page - TBD"
+              return redirect(url_for("sellvehicle", vin="0KQT4QWDSFO183874"))
         else:
           return render_template('addbusiness.html', form=form)
 
@@ -248,8 +248,8 @@ def purchasevehicle():
 
       vehicle_conditions = ["Excellent", "Very Good", "Good", "Fair"]
       
-      customer_type = session["seller"]["customer_type"] if "seller" in session.keys() else None
-      customer_name = session["seller"]["customer_name"] if "seller" in session.keys() else None
+      customer_type = session["seller"]["customer_type"] if "customer_type" in session["seller"].keys() else None
+      customer_name = session["seller"]["customer_name"] if "customer_name" in session["seller"].keys() else None
 
       current_year = datetime.datetime.now().year
 
@@ -294,7 +294,7 @@ def purchasevehicle():
           mysql.connection.commit()
           cursor.close()
 
-          session["seller"] = None
+          session["seller"] = {}
           session["previous_page"] = None
 
           return "Done"
@@ -302,18 +302,27 @@ def purchasevehicle():
 @app.route("/sell/vin=<string:vin>", methods=["GET", "POST"])
 def sellvehicle(vin):
       errors = []
-      session["previous_page"] = "sell"
+      # session["previous_page"] = "sell"
 
       cursor = mysql.connection.cursor()
       
-      customer_type = session["buyer"]["customer_type"] if "buyer" in session.keys() else None
-      customer_name = session["buyer"]["customer_name"] if "buyer" in session.keys() else None
+      customer_type = session["buyer"]["customer_type"] if "customer_type" in session["buyer"].keys() else None
+      customer_name = session["buyer"]["customer_name"] if "customer_name" in session["buyer"].keys() else None
 
-      cursor.execute("SELECT vin, manufacturer_name, vehicle_type, model_name, model_year, mileage, sales_price from vehicle", )
-      vehicle_data = cursor.fetchall()
+      cursor.execute("SELECT vin, manufacturer_name, vehicle_type, model_name, model_year, mileage, sales_price from vehicle where vin = %s", [vin])
+      data = cursor.fetchone()
 
-      print(vehicle_data[0], file=sys.stderr)
-      return "done"
+      vehicle_data = {}
+      vehicle_data["vin"] = data[0]
+      vehicle_data["manufacturer_name"] = data[1]
+      vehicle_data["vehicle_type"] = data[2]
+      vehicle_data["model_name"] = data[3]
+      vehicle_data["model_year"] = data[4]
+      vehicle_data["mileage"] = data[5]
+      vehicle_data["sales_price"] = data[6]
+
+      print(data, file=sys.stderr)
+      return render_template("sellvehicle.html", vehicle_data=vehicle_data)
 
       # if request.method == "GET":
       #     return render_template("sellvehicle.html", vehicle_data=vehicle_data)
@@ -373,143 +382,34 @@ def dropdown():
     colours = ['Red', 'Blue', 'Black', 'Orange']
     form = CustomerID()
     if form.validate_on_submit():
-        return render_template('test.html', colours=colours)
+      return render_template('test.html', colours=colours)
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
     cursor = mysql.connection.cursor()
-    cursor.execute("""SELECT 
-  customer_name,
-  COUNT(*) AS vehicles_sold,
-  ROUND(AVG(purchase_price),2) AS avg_purchase_price,
-  COALESCE(ROUND(AVG(number_of_repairs),2),0) AS avg_number_of_repairs
-FROM
-(SELECT
-  customer.customer_id,
-  CONCAT(individual.individual_first_name," ",individual.individual_last_name) AS customer_name,
-  vehicle.vin,
-  a.number_of_repairs,
-  vehicle.kbb_value AS purchase_price
-FROM vehicle
-LEFT JOIN purchase
-ON vehicle.vin=purchase.vin
-LEFT JOIN customer
-ON purchase.customer_id=customer.customer_id
-LEFT JOIN individual
-ON customer.customer_id=individual.customer_id
-LEFT JOIN 
-(SELECT 
-  vin,
-  COUNT(1) AS number_of_repairs
-FROM repair
-GROUP BY vin) a
-ON vehicle.vin=a.vin
-WHERE 
-  individual.individual_first_name IS NOT NULL
-  
-UNION ALL
-
-SELECT 
-  customer.customer_id,
-  business.business_name AS customer_name,
-  vehicle.vin,
-  a.number_of_repairs,
-  vehicle.kbb_value AS purchase_price
-FROM vehicle
-LEFT JOIN purchase
-ON vehicle.vin=purchase.vin
-LEFT JOIN customer
-ON purchase.customer_id=customer.customer_id
-LEFT JOIN business
-ON customer.customer_id=business.customer_id
-LEFT JOIN 
-(SELECT 
-  vin,
-  COUNT(1) AS number_of_repairs
-FROM repair
-GROUP BY vin) a
-ON vehicle.vin=a.vin
-WHERE 
-  business.business_name IS NOT NULL) b
-GROUP BY customer_id, customer_name
-ORDER BY
-  vehicles_sold DESC,
-  avg_purchase_price ASC;
-  """)
+    cursor.execute(sql.reports_seller_history)
     data = cursor.fetchall()
     return render_template("display_seller_history_table.html", data=data)
 
 @app.route('/report/inventoryage', methods=['GET'])
 def get_InventoryAge():
-  cursor = mysql.connection.cursor()
-  cursor.execute("""SELECT
-  vehicle_type.vehicle_type,
-  COALESCE(a.min_age, 'N/A') AS min_age,
-  COALESCE(a.avg_age, 'N/A') AS avg_age,
-  COALESCE(a.max_age, 'N/A') AS max_age
-FROM vehicle_type
-LEFT JOIN 
-(SELECT
-  vehicle_type, 
-  MIN(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS min_age, 
-  AVG(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS avg_age,
-  MAX(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS max_age
-FROM vehicle 
-LEFT JOIN purchase
-ON vehicle.vin=purchase.vin
-LEFT JOIN sale
-ON vehicle.vin=sale.vin
-WHERE 
-  sale.sales_date IS NULL
-GROUP BY vehicle_type) AS a
-on vehicle_type.vehicle_type=a.vehicle_type;
-  """)
-  data = cursor.fetchall()
-  return render_template("display_inventory_age_table.html", data=data)
-
+    cursor = mysql.connection.cursor()
+    cursor.execute(sql.reports_inventoryage)
+    data = cursor.fetchall()
+    return render_template("display_inventory_age_table.html", data=data)
 
 @app.route('/report/averagetimeininventory', methods=['GET'])
 def get_AvgTimeInInventory():
     cursor = mysql.connection.cursor()
-    cursor.execute("""SELECT
-  vehicle_type.vehicle_type,
-  COALESCE(a.min_age, 'N/A') AS min_age,
-  COALESCE(a.avg_age, 'N/A') AS avg_age,
-  COALESCE(a.max_age, 'N/A') AS max_age
-FROM vehicle_type 
-LEFT JOIN 
-(SELECT
-  vehicle_type, 
-  MIN(DATEDIFF(sales_date, purchase_date)) AS min_age, 
-  AVG(DATEDIFF(sales_date, purchase_date)) AS avg_age,
-  MAX(DATEDIFF(sales_date, purchase_date)) AS max_age
-FROM vehicle 
-LEFT JOIN purchase
-ON vehicle.vin=purchase.vin
-LEFT JOIN sale
-ON vehicle.vin=sale.vin
-WHERE 
-  sales_date IS NOT NULL -- only for sold vehicles
-GROUP BY vehicle_type) AS a
-ON a.vehicle_type=vehicle_type.vehicle_type;
-    """)
+    cursor.execute(sql.reports_average_time_in_inventory)
     data = cursor.fetchall()
     return render_template("display_avg_time_in_inventory_table.html", data=data)
-
 
 
 @app.route('/report/priceperrepair', methods=['GET'])
 def get_PricePerRepair():
     cursor = mysql.connection.cursor()
-    cursor.execute("""SELECT
-  vehicle_type,
-  AVG(CASE WHEN vehicle_condition='Excellent' THEN kbb_value ELSE 0 END) AS 'Condition=Excellent',
-  AVG(CASE WHEN vehicle_condition='Very Good' THEN kbb_value ELSE 0 END) AS 'Condition=Very Good',
-  AVG(CASE WHEN vehicle_condition='Good' THEN kbb_value ELSE 0 END) AS 'Condition=Good',
-  AVG(CASE WHEN vehicle_condition='Fair' THEN kbb_value ELSE 0 END) AS 'Condition=Fair'
-FROM vehicle
-GROUP BY vehicle_type;
-    """)
+    cursor.execute(sql.reports_price_per_repair)
     data = cursor.fetchall()
     return render_template("display_price_per_repair_table.html", data=data)
 
@@ -518,76 +418,28 @@ GROUP BY vehicle_type;
 @app.route('/report/repairstatistics', methods=['GET'])
 def get_RepairStats():
     cursor = mysql.connection.cursor()
-    cursor.execute("""SELECT
-  vendor_name,
-  COUNT(*) AS number_of_repairs, 
-  SUM(total_cost) AS total_spend,
-  COUNT(distinct vin) AS number_of_vehicles,
-  AVG(DATEDIFF(repair_end_date, repair_start_date)) AS avg_duration
-FROM repair
-WHERE
-  repair_status='Complete'
-GROUP BY vendor_name;
-    """)
+    cursor.execute(sql.reports_repair_statistics)
     data = cursor.fetchall()
     return render_template("display_repair_stats_table.html", data=data)
 
 
 
-@app.route('/report//monthlysales', methods=['GET'])
+@app.route('/report/monthlysales', methods=['GET'])
 def get_MonthlySales():
     cursor = mysql.connection.cursor()
-    cursor.execute("""SELECT 
-  DATE_FORMAT(sales_date, '%Y-%m') as ym,
-  COUNT(1) AS number_of_vehicles,
-  SUM(sales_price) AS sales_revenue,
-  SUM(sales_price - repair_cost - kbb_value) AS net_income
-FROM
-(SELECT 
- vehicle.vin,
- sale.sales_date,
- vehicle.sales_price,
- vehicle.kbb_value,
- repair_total_cost_by_vin.total_cost AS repair_cost 
-FROM vehicle
-LEFT JOIN sale
-ON vehicle.vin=sale.vin
-LEFT JOIN (
-SELECT
-  repair.vin,
-  SUM(repair.total_cost) AS total_cost
-FROM repair
-GROUP BY vin
-) as repair_total_cost_by_vin
-ON repair_total_cost_by_vin.vin=vehicle.vin
-WHERE 
-  sale.sales_date IS NOT NULL) as a  -- vehicle must be sold
-GROUP BY ym
-order by ym DESC;
-    """)
+    print("sql.reports_monthly_sales:",sql.reports_monthly_sales,file=sys.stderr)
+    cursor.execute(sql.reports_monthly_sales)
     data = cursor.fetchall()
-    cursor2 = mysql.connection.cursor()
-    cursor2 = execute("""SELECT
-  user.user_first_name,
-  user.user_last_name,
-  COUNT(1) AS number_of_vehicles,
-  SUM(vehicle.sales_price) AS total_sales
-FROM vehicle
-LEFT JOIN sale
-ON vehicle.vin=sale.vin
-LEFT JOIN user
-ON sale.login_username=user.login_username
-WHERE
-  DATE_FORMAT(sales_date, '%Y-%m')='2019-06'
-GROUP BY 
- user.login_username
-ORDER BY
- number_of_vehicles DESC,
- total_sales DESC;
-    """)
-    return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
+    return render_template("display_monthly_sales_table.html", data=data)
 
 
+
+@app.route('/report/monthlysalesdrilldown/yearmonth=<string:yearmonth>', methods=['GET'])
+def get_MonthlySalesDrilldown(yearmonth=None):
+    cursor = mysql.connection.cursor()
+    cursor.execute(sql.reports_monthly_sales_drilldown(yearmonth))
+    data = cursor.fetchall()
+    return render_template("display_monthly_sales_drilldown_table.html", data=data)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+  app.run(debug=True)

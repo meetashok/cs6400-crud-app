@@ -2,18 +2,18 @@
 {% block content %}
 <!-- Page Content -->
 <div class="container">
-  <h1 class="mt-4">Monthly Sales Report!</h1>
+  <h1 class="mt-4">Monthly Sales Report Drilldown!</h1>
   <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">Year Month</th>
+      <th scope="col">User First Name</th>
+      <th scope="col">User Last Name</th>
       <th scope="col">Number Of Vehicles</th>
-      <th scope="col">Sales Revenue</th>
-      <th scope="col">Net Income</th>
+      <th scope="col">Total Sales</th>
     </tr>
     {% for item in data %}
     <tr>
-      <td onclick="location.href='/report/monthlysalesdrilldown/yearmonth={{item[0]}}'"><a href="http://127.0.0.1:5000/report/monthlysalesdrilldown/yearmonth={{item[0]}}">{{item[0]}}</a></td>
+      <td>{{item[0]}}</td>
       <td>{{item[1]}}</td>
       <td>{{item[2]}}</td>
       <td>{{item[3]}}</td>

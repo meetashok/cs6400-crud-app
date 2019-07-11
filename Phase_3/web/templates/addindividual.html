@@ -3,13 +3,12 @@
 
 {% block content %}
 
-<div class="container">
+<div class="container">  
 <div class="card card-body">
 <form action="/addindividual" method="POST">
+  <p>TEST: {{ session }}!</p>
     <div class="form-group">
-      
       {{ wtf.quick_form(form) }}
-      
   </div>
 </form>
 </div>
