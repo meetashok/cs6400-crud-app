@@ -22,7 +22,7 @@
   </tbody>
   </table>
   <p>
-      <form action="" method="post">
+      <form action="/login" method="post">
         <input type="text" placeholder="Username" name="username" value="{{
           request.form.username }}">
          <input type="password" placeholder="Password" name="password" value="{{
@@ -30,27 +30,6 @@
         <input class="btn btn-default" type="submit" value="Login">
       </form>
   </p>
-      <!--
-    <form action="" method="POST">
-        {{ form.csrf_token }}        
-        {{ form.vehicle_type.label }} 
-        {{ form.vehicle_type }} 
-        <br>
-        {{ form.manufacturer_name.label }} 
-        {{ form.manufacturer_name }} 
-        <br>
-        {{ form.color.label }} 
-        {{ form.color }} 
-        <br>
-        {{ form.model_year.label }} 
-        {{ form.model_year }} 
-        <br>
-        {{ form.keyword.label }} 
-        {{ form.keyword }} 
-        <br>
-        {{ form.submit }}
-    </form>
-    -->
   <div class="collapse" id="collapseExample">
     <div class="card card-body">
       <form action="/" method="POST">

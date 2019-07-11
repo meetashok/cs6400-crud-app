@@ -5,8 +5,12 @@
 <!-- Page Content -->
 <div class="container">
   <h1 class="mt-4">Repairs!</h1>
+  {% if vin=='BLANK' %}
+  <p>no vin provided!...</p>
+  {% endif %}
+  {% if vin!='BLANK' %}
   <p>repair info for vin (<b>{{ vin }}</b>)...</p>
-  <p>{{ confirm }}</p>
+  {% endif %}
   <table class="table table-striped">
   <thead>
     <tr>
@@ -42,11 +46,9 @@
   </p>
   <div class="collapse" id="collapseExample">
     <div class="card card-body">
-      <form action="/repairs/vin=12345" method="POST">
+      <form action="/repairs/vin={{ vin }}" method="POST">
       <div class="form-group">
-        
         {{ wtf.quick_form(form) }}
-        
       <button type="submit" class="btn btn-primary">Add Repair</button>
       </form>
     </div>

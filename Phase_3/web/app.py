@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
+import sys
 import sql.sql_codes as sql
 import sys
 import datetime
@@ -26,10 +27,12 @@ app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
 # cursor = mysql.connection.cursor()
+session = {}
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
-def main(query="DEFAULT"):
+########Count of vehicles for sale
+def main():
     cursor = mysql.connection.cursor()
     cursor.execute(("""SELECT
       count(vehicle.vin) as vehicles_available
@@ -49,61 +52,75 @@ WHERE
   sale.sales_date IS NULL;"""),)
     vehicle_data = cursor.fetchall()
     mysql.connection.commit() 
+    return render_template('main.html', vehicle_data=vehicle_data)  # render main template
 
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid Credentials. Please try again.'
-        else:
-          return redirect(url_for('main'))  ###here will use separate authenticated main pages?
-
-    return render_template('main.html', vehicle_data=vehicle_data, query=query, error=error)  # render a template
-"""
-def search():
-    form = SearchForm()
-    if request.method == "GET":
-        return render_template('main.html', form=form)
-
-    if request.method == "POST":
-        if form.validate() == True:
-            vehicle_type = form.vehicle_type.data
-            manufacturer_name = form.manufacturer_name.data
-            color = form.color.data
-            model_year = form.model_year.data
-            keyword = form.keyword.data
-
-            
-            cursor = mysql.connection.cursor()
-            query2 = "SELECT * FROM vehicle"
-            #variables = vehicle_type, manufacturer_name, color, model_year, keyword
-            cursor.execute((query, variables))
-            mysql.connection.commit()
-            # return render_template('welcome.html', query="query")
-            return redirect(url_for("main"))
-
-        else:
-            return render_template('main.html', form=form)
-""" 
-
-
-
-"""
-# route decorator for login page logic
-@app.route('/login', methods=['GET','POST'])
+########Login section
+@app.route('/login', methods=['POST'])
 def login():
-  error = None
-  if request.method == 'POST':
-      if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-          error = 'Invalid Credentials. Please try again.'
+  # Output message if something goes wrong...
+  msg = ''
+  # Check if "username" and "password" POST requests exist (user submitted form)
+  if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+      # Create variables for easy access
+      username = request.form['username']
+      password = request.form['password']
+      # Check if account exists using MySQL
+      cursor = mysql.connection.cursor()
+      cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
+      # Fetch one record and return result
+      user = cursor.fetchone()
+      print(user, file=sys.stderr)
+      print(user[0], file=sys.stderr)
+      print(user[1], file=sys.stderr)
+      print(user[2], file=sys.stderr)
+      # If account exists in accounts table in out database
+      if user[1] == password:
+          # Create session data, we can access this data in other routes
+          session['loggedin'] = True
+          #session['id'] = user['id']
+          session['username'] = username
+          # Redirect to home page
+          return 'Logged in successfully!'
       else:
-        return redirect(url_for('home'))
-  return render_template('login.html', error=error)
-"""
+          # Account doesnt exist or username/password incorrect
+          msg = 'Incorrect username/password!'
+          return msg
+  # Show the login form with message (if any)
+  return render_template('main.html', msg=msg)    
+######Logout section (need a button?)
+def logout():
+  # Remove session data, this will log the user out
+  session.pop('loggedin', None)
+  session.pop('id', None)
+  session.pop('username', None)
+  # Redirect to login page
+  return redirect(url_for('main'))  
+### ##########Search form section
+### def search():
+###     form = SearchForm()
+###     if request.method == "GET":
+###         return render_template('main.html', form=form)
+### 
+###     if request.method == "POST":
+###         if form.validate() == True:
+###             vehicle_type = form.vehicle_type.data
+###             manufacturer_name = form.manufacturer_name.data
+###             color = form.color.data
+###             model_year = form.model_year.data
+###             keyword = form.keyword.data
+### 
+###             
+###             cursor = mysql.connection.cursor()
+###             query2 = "SELECT * FROM vehicle"
+###             #variables = vehicle_type, manufacturer_name, color, model_year, keyword
+###             cursor.execute((query, variables))
+###             mysql.connection.commit()
+###             # return render_template('welcome.html', query="query")
+###             return redirect(url_for("main"))
+### 
+###         else:
+###             return render_template('main.html', form=form)
 
-
-
-# @app.route('/repair')
-# @app.route('/repairs')
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
@@ -114,22 +131,25 @@ def repairs(vin="BLANK"):
       repair_data = cursor.fetchall()
       mysql.connection.commit()
       return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
-    
+     
     if request.method == "POST":
-        if form.validate() == True:
-          cursor = mysql.connection.cursor()
-          repair_status = "Pending"
-          query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-          parameters = [vin, form.repair_start_date.data, form.repair_end_date.data, form.vendor_name.data, form.nhtsa_recall_number.data, form.total_cost.data, form.repair_description.data, repair_status]
-          cursor.execute(query, parameters)
-          mysql.connection.commit()
-          return redirect(url_for("repairs/vin={0}".format(vin)))
-        else:
-          return render_template("repairs.html", vin=vin, repair_data=repair_data, confirm=post_confirm, form=form)
-    
+      if form.validate() == True:
+        cursor = mysql.connection.cursor()
+        repair_status = "Pending"
+        query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        nhtsa_recall_number = form.nhtsa_recall_number.data
+        if form.nhtsa_recall_number.data == "":
+          nhtsa_recall_number = None
+        parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
+        print((query,parameters), file=sys.stderr)
+        cursor.execute(query, parameters)
+        mysql.connection.commit()
+        return redirect(url_for("repairs", vin=vin))
+      else:
+        return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
-def addindividual():
+def addindividual(previous_page=None):
     form = IndividualForm()
     if request.method == "GET":
         return render_template('addindividual.html', form=form)
@@ -148,8 +168,7 @@ def addindividual():
             variables = [form.driver_license_number.data, last_customer_id, form.individual_first_name.data, form.individual_last_name.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            # return render_template('welcome.html', query="query")
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addindividual.html', form=form)
 
@@ -175,7 +194,7 @@ def addbusiness():
             cursor.execute(query, variables)
             mysql.connection.commit()
             # return render_template('welcome.html', query="query")
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addbusiness.html', form=form)
 
@@ -191,7 +210,7 @@ def addvendor():
             variables = [form.vendor_name.data, form.vendor_phone_number.data, form.street.data, form.city.data, form.state.data, form.postal_code.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addvendor.html', form=form)
 
