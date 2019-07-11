@@ -4,14 +4,91 @@
 {% block content %}
 
 <div class="container">
+    
+      
 <div class="card card-body">
-<form action="/purchasevehicle" method="POST">
+    <ul class="list-group">
+        {% for error in errors %}
+          <li class="list-group-item list-group-item-danger">{{error}}</li>
+        {% endfor %}
+    </ul>
+
+    <a class="btn btn-primary" href="{{ '/searchcustomer' }}" role="button">Search customer</a>
+    <a class="btn btn-primary" href="{{ '/addindividual' }}" role="button">Add customer</a>
+
+    <form action="/purchasevehicle" method="POST">
+      <div class="form-group">
+        <label for="vin">VIN</label>
+        <input type="text" class="form-control" id="vin" aria-describedby="emailHelp" placeholder="Enter VIN" name="vin">
+        
+      </div>
+
+      <div class="form-group">
+          <label for="manufacturer">Select list:</label>
+          <select class="form-control" id="manufacturer_name" name="manufacturer_name">
+          {% for manufacturer_name in manufacturer_names %}
+              <option value="{{ manufacturer_name }}">{{ manufacturer_name }}</option>
+          {% endfor %}
+          </select>
+      </div>
+
+      <div class="form-group">
+          <label for="vehicle_type">Select list:</label>
+          <select class="form-control" id="vehicle_type" name="vehicle_type">
+          {% for vehicle_type in vehicle_types %}
+              <option value="{{ vehicle_type }}">{{ vehicle_type }}</option>
+          {% endfor %}
+          </select>
+      </div>
+
+      <div class="form-group">
+          <label for="model_year">Year</label>
+          <input type="text" class="form-control" id="model_year" aria-describedby="emailHelp" placeholder="Enter year" name="model_year">
+      </div>
+
+      <div class="form-group">
+          <label for="model_name">Model</label>
+          <input type="text" class="form-control" id="model_name" aria-describedby="emailHelp" placeholder="Enter model" name="model_name">
+      </div>
+
+      <div class="form-group">
+          <label for="mileage">Mileage</label>
+          <input type="text" class="form-control" id="mileage" aria-describedby="emailHelp" placeholder="Enter mileage" name="mileage">
+      </div>
+
+      <div class="form-group">
+          <label for="vehicle_condition">Select list:</label>
+          <select class="form-control" id="vehicle_condition" name="vehicle_condition">
+          {% for vehicle_condition in vehicle_conditions %}
+              <option value="{{ vehicle_condition }}">{{ vehicle_condition }}</option>
+          {% endfor %}
+          </select>
+      </div>
+
+      <div class="form-group">
+          <label for="vehicle_description">Description</label>
+          <input type="text" class="form-control" id="vehicle_description" aria-describedby="emailHelp" placeholder="Enter description" name="vehicle_description">
+      </div>
+
+      <div class="form-group">
+          <label for="kbb_value">Purchase price</label>
+          <input type="text" class="form-control" id="kbb_value" aria-describedby="emailHelp" placeholder="Purchase price" name="kbb_value">
+      </div>
+
     <div class="form-group">
+        <label for="colors">Mutiple select list (hold shift to select more than one):</label>
+        <select multiple class="form-control" id="colors" name="colors">
+          {% for color in colors %}
+            <option value="{{ color }}">{{ color }}</option>
+          {% endfor %}
+        </select>
+      </div>
       
-      {{ wtf.quick_form(form) }}
+
       
-  </div>
-</form>
+
+      <button type="submit" class="btn btn-primary">Add Repair</button>
+      </form>
 </div>
 </div>
 {% endblock %}

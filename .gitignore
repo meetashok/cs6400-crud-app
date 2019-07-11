@@ -3,6 +3,9 @@
 *.swo
 *~
 __pycache__/
+__init__.py*
+__init__.py
+__init__.pyc
 create_database_mysql.sql
 report_01.sql
 report_02.sql

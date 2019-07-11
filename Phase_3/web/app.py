@@ -1,107 +1,120 @@
-# import the Flask class from the flask module
+# import Flask with dependecies
 from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-
 from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm
 
-import sql.sql_codes as sql
-# NOTE usage: sql.queries
+# import sql templating class
+from  sql.sql import QueryDB
+sql = QueryDB()
 
-# create the application object
+# import misc python modules
+import sys
+import datetime
+
+# instantiate Flask app
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
 app.secret_key = 'development key'
 
-# create the connection to MySQL
+# build connection to MySQL
 mysql = MySQL(app)
-
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'abcd_123'
 app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
-# cursor = mysql.connection.cursor()
+# setup session dictionary for user authentication
+session = {
+  "authenticated":False,
+  "username":"guest",
+  "role": None
+}
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
-def main(query="DEFAULT"):
-    cursor = mysql.connection.cursor()
-    cursor.execute(("""SELECT
-      count(vehicle.vin) as vehicles_available
-FROM vehicle 
-LEFT JOIN
-(
-  SELECT
-    distinct(vin)  as vin
-  FROM repair
-  WHERE repair_status IN ('In Progress','Pending')
-) vehicle_in_repair 
-ON vehicle.vin=vehicle_in_repair.vin
-LEFT JOIN sale
-  ON vehicle.vin=sale.vin
-WHERE 
-  vehicle_in_repair.vin IS NULL AND
-  sale.sales_date IS NULL;"""),)
-    vehicle_data = cursor.fetchall()
-    mysql.connection.commit() 
+def main():
+  print("session:",session,file=sys.stderr)
+  cursor = mysql.connection.cursor()
+  # count of vehicles for sale
+  cursor.execute(sql.count_vehicles_available)
+  count_vehicles_available = cursor.fetchone()
+  print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
+  if count_vehicles_available:
+    count_vehicles_available = count_vehicles_available[0]
+  return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
 
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid Credentials. Please try again.'
-        else:
-          return redirect(url_for('main'))  ###here will use separate authenticated main pages?
-
-    return render_template('main.html', vehicle_data=vehicle_data, query=query, error=error)  # render a template
-"""
-def search():
-    form = SearchForm()
-    if request.method == "GET":
-        return render_template('main.html', form=form)
-
-    if request.method == "POST":
-        if form.validate() == True:
-            vehicle_type = form.vehicle_type.data
-            manufacturer_name = form.manufacturer_name.data
-            color = form.color.data
-            model_year = form.model_year.data
-            keyword = form.keyword.data
-
-            
-            cursor = mysql.connection.cursor()
-            query2 = "SELECT * FROM vehicle"
-            #variables = vehicle_type, manufacturer_name, color, model_year, keyword
-            cursor.execute((query, variables))
-            mysql.connection.commit()
-            # return render_template('welcome.html', query="query")
-            return redirect(url_for("main"))
-
-        else:
-            return render_template('main.html', form=form)
-""" 
-
-
-
-"""
-# route decorator for login page logic
-@app.route('/login', methods=['GET','POST'])
+# login handler
+@app.route('/login', methods=['POST'])
 def login():
-  error = None
-  if request.method == 'POST':
-      if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-          error = 'Invalid Credentials. Please try again.'
-      else:
-        return redirect(url_for('home'))
-  return render_template('login.html', error=error)
-"""
+  # Output message if something goes wrong...
+  msg = ''
+  # Check if "username" and "password" POST requests exist (user submitted form)
+  if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+    # Create variables for easy access
+    username = request.form['username']
+    password = request.form['password']
+    # Check if account exists using MySQL
+    cursor = mysql.connection.cursor()
+    print("sql.check_login_username_and_password,(username, password):",sql.check_login_username_and_password,(username, password),file=sys.stderr)
+    cursor.execute(sql.check_login_username_and_password,(username, password))
+    # Fetch one record and return result
+    user = cursor.fetchone()
+    print("user:",user, file=sys.stderr)
+    if user:
+      print("login_username:",user[0], file=sys.stderr)
+      print("login_password:",user[1], file=sys.stderr)
+      print("role:",user[2], file=sys.stderr)
+    # If account exists in accounts table in out database
+    if user and user[1] == password:
+      # Create session data, we can access this data in other routes
+      session["authenticated"] = True
+      session["username"] = user[0]
+      session["role"] = user[2] 
+      msg = 'Logged in successfully!'
+    else:
+      # Account doesnt exist or username/password incorrect
+      msg = 'Incorrect username/password!'
+  # Show the login form with message (if any)
+  return redirect(url_for('main'))  
 
+# logout handler
+@app.route('/logout', methods=['POST'])
+def logout():
+  # remove session data, this will log the user out
+  session["authenticated"] = False
+  session["username"] = "guest"
+  session["role"] = None
+  return redirect(url_for('main'))  
 
+### ##########Search form section
+### def search():
+###     form = SearchForm()
+###     if request.method == "GET":
+###         return render_template('main.html', form=form)
+### 
+###     if request.method == "POST":
+###         if form.validate() == True:
+###             vehicle_type = form.vehicle_type.data
+###             manufacturer_name = form.manufacturer_name.data
+###             color = form.color.data
+###             model_year = form.model_year.data
+###             keyword = form.keyword.data
+### 
+###             
+###             cursor = mysql.connection.cursor()
+###             query2 = "SELECT * FROM vehicle"
+###             #variables = vehicle_type, manufacturer_name, color, model_year, keyword
+###             cursor.execute((query, variables))
+###             mysql.connection.commit()
+###             # return render_template('welcome.html', query="query")
+###             return redirect(url_for("main"))
+### 
+###         else:
+###             return render_template('main.html', form=form)
 
-# @app.route('/repair')
-# @app.route('/repairs')
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
@@ -112,22 +125,25 @@ def repairs(vin="BLANK"):
       repair_data = cursor.fetchall()
       mysql.connection.commit()
       return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
-    
+     
     if request.method == "POST":
-        if form.validate() == True:
-          cursor = mysql.connection.cursor()
-          repair_status = "Pending"
-          query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-          parameters = [vin, form.repair_start_date.data, form.repair_end_date.data, form.vendor_name.data, form.nhtsa_recall_number.data, form.total_cost.data, form.repair_description.data, repair_status]
-          cursor.execute(query, parameters)
-          mysql.connection.commit()
-          return redirect(url_for("repairs/vin={0}".format(vin)))
-        else:
-          return render_template("repairs.html", vin=vin, repair_data=repair_data, confirm=post_confirm, form=form)
-    
+      if form.validate() == True:
+        cursor = mysql.connection.cursor()
+        repair_status = "Pending"
+        query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+        nhtsa_recall_number = form.nhtsa_recall_number.data
+        if form.nhtsa_recall_number.data == "":
+          nhtsa_recall_number = None
+        parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
+        print((query,parameters), file=sys.stderr)
+        cursor.execute(query, parameters)
+        mysql.connection.commit()
+        return redirect(url_for("repairs", vin=vin))
+      else:
+        return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
-def addindividual():
+def addindividual(previous_page=None):
     form = IndividualForm()
     if request.method == "GET":
         return render_template('addindividual.html', form=form)
@@ -146,8 +162,7 @@ def addindividual():
             variables = [form.driver_license_number.data, last_customer_id, form.individual_first_name.data, form.individual_last_name.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            # return render_template('welcome.html', query="query")
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addindividual.html', form=form)
 
@@ -173,7 +188,7 @@ def addbusiness():
             cursor.execute(query, variables)
             mysql.connection.commit()
             # return render_template('welcome.html', query="query")
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addbusiness.html', form=form)
 
@@ -189,28 +204,45 @@ def addvendor():
             variables = [form.vendor_name.data, form.vendor_phone_number.data, form.street.data, form.city.data, form.state.data, form.postal_code.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            return redirect(url_for("welcome"))
+            return redirect(url_for("main"))
         else:
             return render_template('addvendor.html', form=form)
 
 @app.route("/purchasevehicle", methods=["GET", "POST"])
 def purchasevehicle():
+      errors = []
+
       cursor = mysql.connection.cursor()
-      form = VehicleForm()
-      form.manufacturer_name.choices = ["bmw", "honda"]
-      form.vehicle_type.choices = ["suv", "sedan"]
-      form.model_year.choices = [1900, 1901]
+      cursor.execute("SELECT manufacturer_name from manufacturer")
+      manufacturer_names = [record[0] for record in cursor.fetchall()]
+      
+      cursor.execute("SELECT vehicle_type from vehicle_type")
+      vehicle_types = [record[0] for record in cursor.fetchall()]
+
+      colors = ['Aluminum', 'Beige', 'Black', 'Blue', 'Brown', 'Bronze', 'Claret', 'Copper', 
+      'Cream', 'Gold', 'Gray', 'Green', 'Maroon', 'Metallic', 'Navy', 'Orange', 'Pink', 
+      'Purple', 'Red', 'Rose', 'Rust', 'Silver', 'Tan', 'Turquoise', 'White', 'Yellow']
+
+      vehicle_conditions = ["Excellent", "Very Good", "Good", "Fair"]
+      
+      current_year = datetime.datetime.now().year
+
       if request.method == "GET":
-            render_template("purchasevehicle.html", form=form)
+          return render_template("purchasevehicle.html", manufacturer_names=manufacturer_names,
+          vehicle_types=vehicle_types, colors=colors, vehicle_conditions=vehicle_conditions, errors=errors)
       if request.method == "POST":
-            if form.validate() == True:
-                  cursor = mysql.connection.cursor()
-                  query = "INSERT INTO vehicle (vin, manufacturer_name, vehicle_type, model_year, model_name, mileage, vehicle_condition, vehicle_description, sales_price, kbb_value) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" 
-                  sales_price = float(form.kbb_value.data) * 1.25
-                  parameters = [form.vin.data, form.manufacturer_name.data, form.vehicle_type.data, form.model_year.data, 
-                  form.model_name.data, form.vehicle_condition.data, form.vehicle_description.data, sales_price, form.kbb_value.data]
-                  cursor.execute(query, parameters)
-                  mysql.connection.commit()
+          vin = request.form.get("vin")
+          manufacturer_name = request.form.get("manufacturer_name")
+          vehicle_type = request.form.get("vehicle_type")
+          model_year = request.form.get("model_year")
+          model_name = request.form.get("model_name")
+          mileage = request.form.get("mileage")
+          vehicle_condition = request.form.get("vehicle_condition")
+          vehicle_description = request.form.get("vehicle_description")
+          kbb_value = request.form.get("kbb_value")
+          colors = request.form.getlist("colors")
+
+          return "Done"
       
 
 @app.route("/searchcustomer", methods=["GET", "POST"])
@@ -441,7 +473,5 @@ ORDER BY
     """)
     return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
 
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+  app.run(debug=True)
