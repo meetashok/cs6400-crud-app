@@ -421,7 +421,7 @@ GROUP BY vendor_name;
 
 
 @app.route('/report/monthlysales', methods=['GET'])
-def get_MonthlySales(data_drilldown = ""):
+def get_MonthlySales():
     cursor = mysql.connection.cursor()
     cursor.execute("""SELECT 
   DATE_FORMAT(sales_date, '%Y-%m') as ym,
@@ -452,8 +452,14 @@ GROUP BY ym
 order by ym DESC;
     """)
     data = cursor.fetchall()
-    cursor2 = mysql.connection.cursor()
-    cursor2.execute("""SELECT
+    return render_template("display_monthly_sales_table.html", data=data)
+
+
+
+@app.route('/report/monthlysalesdrilldown', methods=['GET'])
+def get_MonthlySalesDrilldown():
+    cursor = mysql.connection.cursor()
+    cursor.execute("""SELECT
   user.user_first_name,
   user.user_last_name,
   COUNT(1) AS number_of_vehicles,
@@ -471,7 +477,8 @@ ORDER BY
  number_of_vehicles DESC,
  total_sales DESC;
     """)
-    return render_template("display_monthly_sales_table.html", data=data, data_drilldown = data_drilldown)
+    data = cursor.fetchall()
+    return render_template("display_monthly_sales_drilldown_table.html", data=data)
 
 if __name__ == "__main__":
   app.run(debug=True)
