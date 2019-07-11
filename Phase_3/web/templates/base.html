@@ -27,20 +27,25 @@
         </li>
         {% if not session.authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Login</a>
         </li>
+        <div class="collapse" id="collapseExample">
+          <div class="card card-body">
+            <form action="/login" method="post">
+              <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" required>
+               <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}" required>
+              <input class="btn btn-primary" type="submit" value="Authenticate">
+            </form> 
+          </div>
+        </div>
         {% endif %}
         {% if session.authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Logout</a>
+          <form action="/logout" method="post">
+            <input class="btn btn-link" type="submit" value="Logout">
+          </form>
         </li>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="#">Vehicle Search</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="repairs">Repairs</a>
-        </li>
       </ul>
     </div>
   </div>
