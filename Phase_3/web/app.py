@@ -25,10 +25,12 @@ app.config['MYSQL_DB'] = 'cs6400_sm19_team013'
 app.config['MYSQL_PORT'] = 3306
 
 # cursor = mysql.connection.cursor()
+session = {}
 
 # main page with vehicle count, login, and search
 @app.route('/', methods=['GET', 'POST'])
-def main(query="DEFAULT"):
+########Count of vehicles for sale
+def main():
     cursor = mysql.connection.cursor()
     cursor.execute(("""SELECT
       count(vehicle.vin) as vehicles_available
@@ -48,53 +50,74 @@ WHERE
   sale.sales_date IS NULL;"""),)
     vehicle_data = cursor.fetchall()
     mysql.connection.commit() 
-     
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid Credentials. Please try again.'
-        else:
-          return redirect(url_for('main'))  ###here will use separate authenticated main pages?
+    return render_template('main.html', vehicle_data=vehicle_data)  # render main template
 
-    return render_template('main.html', vehicle_data=vehicle_data, query=query, error=error)  # render a template
-"""
-def search():
-    form = SearchForm()
-    if request.method == "GET":
-        return render_template('main.html', form=form)
-
-    if request.method == "POST":
-        if form.validate() == True:
-            vehicle_type = form.vehicle_type.data
-            manufacturer_name = form.manufacturer_name.data
-            color = form.color.data
-            model_year = form.model_year.data
-            keyword = form.keyword.data
-
-            
-            cursor = mysql.connection.cursor()
-            query2 = "SELECT * FROM vehicle"
-            #variables = vehicle_type, manufacturer_name, color, model_year, keyword
-            cursor.execute((query, variables))
-            mysql.connection.commit()
-            # return render_template('welcome.html', query="query")
-            return redirect(url_for("main"))
-
-        else:
-            return render_template('main.html', form=form)
-
-# route decorator for login page logic
-@app.route('/login', methods=['GET','POST'])
+########Login section
+@app.route('/login', methods=['POST'])
 def login():
-  error = None
-  if request.method == 'POST':
-      if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-          error = 'Invalid Credentials. Please try again.'
+  # Output message if something goes wrong...
+  msg = ''
+  # Check if "username" and "password" POST requests exist (user submitted form)
+  if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+      # Create variables for easy access
+      username = request.form['username']
+      password = request.form['password']
+      # Check if account exists using MySQL
+      cursor = mysql.connection.cursor()
+      cursor.execute('SELECT login_username, login_password, role FROM user WHERE login_username = %s AND login_password = %s', (username, password))
+      # Fetch one record and return result
+      user = cursor.fetchone()
+      print(user, file=sys.stderr)
+      print(user[0], file=sys.stderr)
+      print(user[1], file=sys.stderr)
+      print(user[2], file=sys.stderr)
+      # If account exists in accounts table in out database
+      if user[1] == password:
+          # Create session data, we can access this data in other routes
+          session['loggedin'] = True
+          #session['id'] = user['id']
+          session['username'] = username
+          # Redirect to home page
+          return 'Logged in successfully!'
       else:
-        return redirect(url_for('home'))
-  return render_template('login.html', error=error)
-"""
-
+          # Account doesnt exist or username/password incorrect
+          msg = 'Incorrect username/password!'
+          return msg
+  # Show the login form with message (if any)
+  return render_template('main.html', msg=msg)    
+######Logout section (need a button?)
+def logout():
+  # Remove session data, this will log the user out
+  session.pop('loggedin', None)
+  session.pop('id', None)
+  session.pop('username', None)
+  # Redirect to login page
+  return redirect(url_for('main'))  
+### ##########Search form section
+### def search():
+###     form = SearchForm()
+###     if request.method == "GET":
+###         return render_template('main.html', form=form)
+### 
+###     if request.method == "POST":
+###         if form.validate() == True:
+###             vehicle_type = form.vehicle_type.data
+###             manufacturer_name = form.manufacturer_name.data
+###             color = form.color.data
+###             model_year = form.model_year.data
+###             keyword = form.keyword.data
+### 
+###             
+###             cursor = mysql.connection.cursor()
+###             query2 = "SELECT * FROM vehicle"
+###             #variables = vehicle_type, manufacturer_name, color, model_year, keyword
+###             cursor.execute((query, variables))
+###             mysql.connection.commit()
+###             # return render_template('welcome.html', query="query")
+###             return redirect(url_for("main"))
+### 
+###         else:
+###             return render_template('main.html', form=form)
 
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
