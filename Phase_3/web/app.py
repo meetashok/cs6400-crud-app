@@ -456,8 +456,8 @@ order by ym DESC;
 
 
 
-@app.route('/report/monthlysalesdrilldown', methods=['GET'])
-def get_MonthlySalesDrilldown():
+@app.route('/report/monthlysalesdrilldown/yearmonth=<string:yearmonth>', methods=['GET'])
+def get_MonthlySalesDrilldown(yearmonth=None):
     cursor = mysql.connection.cursor()
     cursor.execute("""SELECT
   user.user_first_name,
@@ -470,8 +470,8 @@ ON vehicle.vin=sale.vin
 LEFT JOIN user
 ON sale.login_username=user.login_username
 WHERE
-  DATE_FORMAT(sales_date, '%Y-%m')='2019-06'
-GROUP BY 
+  DATE_FORMAT(sales_date, '%Y-%m')=""" + "'" +yearmonth+ "'" +
+""" GROUP BY 
  user.login_username
 ORDER BY
  number_of_vehicles DESC,
