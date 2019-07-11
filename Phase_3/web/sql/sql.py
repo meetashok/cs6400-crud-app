@@ -104,31 +104,31 @@ class QueryDB:
       """
 # }}}
 # {{{ reports_inventory_age()
-@property
-def reports_inventoryage(self):
-  return """
-  SELECT
-  vehicle_type.vehicle_type,
-  COALESCE(a.min_age, 'N/A') AS min_age,
-  COALESCE(a.avg_age, 'N/A') AS avg_age,
-  COALESCE(a.max_age, 'N/A') AS max_age
-  FROM vehicle_type
-  LEFT JOIN 
-  (SELECT
-    vehicle_type, 
-    MIN(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS min_age, 
-    AVG(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS avg_age,
-    MAX(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS max_age
-  FROM vehicle 
-  LEFT JOIN purchase
-  ON vehicle.vin=purchase.vin
-  LEFT JOIN sale
-  ON vehicle.vin=sale.vin
-  WHERE 
-    sale.sales_date IS NULL
-  GROUP BY vehicle_type) AS a
-  on vehicle_type.vehicle_type=a.vehicle_type
-  """
+  @property
+  def reports_inventoryage(self):
+    return """
+    SELECT
+    vehicle_type.vehicle_type,
+    COALESCE(a.min_age, 'N/A') AS min_age,
+    COALESCE(a.avg_age, 'N/A') AS avg_age,
+    COALESCE(a.max_age, 'N/A') AS max_age
+    FROM vehicle_type
+    LEFT JOIN 
+    (SELECT
+      vehicle_type, 
+      MIN(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS min_age, 
+      AVG(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS avg_age,
+      MAX(DATEDIFF(CURRENT_TIMESTAMP, purchase.purchase_date)) AS max_age
+    FROM vehicle 
+    LEFT JOIN purchase
+    ON vehicle.vin=purchase.vin
+    LEFT JOIN sale
+    ON vehicle.vin=sale.vin
+    WHERE 
+      sale.sales_date IS NULL
+    GROUP BY vehicle_type) AS a
+    on vehicle_type.vehicle_type=a.vehicle_type
+    """
 # }}}
 # {{{ reports_average_time_in_inventory()
   @property
