@@ -27,9 +27,11 @@
         </li>
         {% if not session.authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">Login</a>
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseLogin" aria-expanded="false" aria-controls="collapseLogin">
+            Login
+          </a>
         </li>
-        <div class="collapse" id="collapseExample">
+        <div class="collapse" id="collapseLogin">
           <div class="card card-body">
             <form action="/login" method="post">
               <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" required>
@@ -46,6 +48,22 @@
           </form>
         </li>
         {% endif %}
+        {% if session.failed_authentication %}
+        <li class="nav-item">
+          <div class="alert alert-danger" role="alert">Incorrect username/password!</div>
+        </li>
+        {% endif %}
+        {% if session.authenticated %}
+        <li class="nav-item">
+          <span class="badge badge-info">Welcome {{session.username}}!</span>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a href="#" class="badge badge-pill badge-warning" data-toggle="collapse" data-target="#collapseDebug" aria-expanded="false" aria-controls="collapseDebug">+debug</a>
+          <div class="collapse" id="collapseDebug">
+            <div class="alert alert-warning" role="alert">{{ session }}</div>
+          </div>
+        </li>
       </ul>
     </div>
   </div>

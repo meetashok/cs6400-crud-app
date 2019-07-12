@@ -29,9 +29,11 @@ app.config['MYSQL_PORT'] = 3306
 # setup session dictionary for user authentication and other session related variables
 session = {
   "authenticated":False,
+  "failed_authentication":False,
   "username":"guest",
   "role": None,
   "previous_page": None,
+  "vin":None,
   "buyer": {},
   "seller": {}
 }
@@ -47,6 +49,7 @@ def main():
   print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
   if count_vehicles_available:
     count_vehicles_available = count_vehicles_available[0]
+  session["previous_page"] = "main"
   return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
 
 # login handler
@@ -74,14 +77,18 @@ def login():
     if user and user[1] == password:
       # Create session data, we can access this data in other routes
       session["authenticated"] = True
+      session["failed_authentication"] = False
       session["username"] = user[0]
       session["role"] = user[2] 
       msg = 'Logged in successfully!'
     else:
       # Account doesnt exist or username/password incorrect
+      session["authenticated"] = False
+      session["failed_authentication"] = True
       msg = 'Incorrect username/password!'
   # Show the login form with message (if any)
-  return redirect(url_for('main'))  
+  # return redirect(url_for(session["previous_page"]))
+  return redirect(url_for("main"))
 
 # logout handler
 @app.route('/logout', methods=['POST'])
@@ -90,7 +97,8 @@ def logout():
   session["authenticated"] = False
   session["username"] = "guest"
   session["role"] = None
-  return redirect(url_for('main'))  
+  # return redirect(url_for(session["previous_page"]))  
+  return redirect(url_for("main"))
 
 ### ##########Search form section
 ### def search():
@@ -118,11 +126,17 @@ def logout():
 ###         else:
 ###             return render_template('main.html', form=form)
 
+@app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
+  if vin != "BLANK":
+    session["vin"] = vin
+  if session["vin"]:
+    vin = session["vin"]
   form = RepairForm()
   # show repairs info for vin
+  session["previous_page"] = "repairs"
   if request.method == "GET":
     cursor = mysql.connection.cursor()
     cursor.execute(sql.repairs_show_repairs, [vin])
