@@ -27,22 +27,43 @@
         </li>
         {% if not session.authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
+          <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapseLogin" aria-expanded="false" aria-controls="collapseLogin">
+            Login
+          </a>
+        </li>
+        <div class="collapse" id="collapseLogin">
+          <div class="card card-body">
+            <form action="/login" method="post">
+              <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" required>
+               <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}" required>
+              <input class="btn btn-secondary" type="submit" value="Authenticate">
+            </form> 
+          </div>
+        </div>
+        {% endif %}
+        {% if session.authenticated %}
+        <li class="nav-item">
+          <form action="/logout" method="post">
+            <input class="btn btn-link" type="submit" value="Logout">
+          </form>
+        </li>
+        {% endif %}
+        {% if session.failed_authentication %}
+        <li class="nav-item">
+          <div class="alert alert-danger" role="alert">Incorrect username/password!</div>
         </li>
         {% endif %}
         {% if session.authenticated %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Logout</a>
+          <span class="nav-link"><span class="text-white">Welcome {{session.username}}!</span></span>
         </li>
         {% endif %}
-        <li class="nav-item">
-          <a class="nav-link" href="#">Vehicle Search</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="repairs">Repairs</a>
-        </li>
       </ul>
     </div>
+  </div>
+  <a href="#" class="badge badge-pill badge-warning" data-toggle="collapse" data-target="#collapseDebug" aria-expanded="false" aria-controls="collapseDebug">+debug</a>
+  <div class="collapse" id="collapseDebug">
+    <div class="alert alert-warning" role="alert">{{ session }}</div>
   </div>
 </nav>
 {% block content %} {% endblock %}

@@ -2,53 +2,65 @@
 
 {% block content %}
 <!-- Page Content -->
-<div class="container">
-  <h1 class="mt-4">Burdell's Ramblin' Wrecks</h1>
-  <p>Welcome {{ session.username }}!</p>
-  <p>TEST: {{ session }}!</p>
-  <p>Number of cars available for purchase: <b>{{ count_vehicles_available }}</b></p>
-  <p>
-    {% if not session.authenticated %}
-    <form action="/login" method="post">
-      <input type="text" placeholder="Username" name="username" value="{{
-        request.form.username }}">
-       <input type="password" placeholder="Password" name="password" value="{{
-        request.form.password }}">
-      <input class="btn btn-default" type="submit" value="Login">
-    </form>
-    {% endif %}
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Burdell's Ramblin' Wrecks</h1>
+    <p class="lead">
+      Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
+    </p>
     {% if session.authenticated %}
-    <form action="/logout" method="post">
-      <input class="btn btn-default" type="submit" value="Logout">
-    </form>
+    <h3>Search by VIN</h3> 
     {% endif %}
-  </p>
-  <div class="collapse" id="collapseExample">
-    <div class="card card-body">
-      <form action="/" method="POST">
-      <div class="form-group">
-        <label for="vehicle_type">Vehicle Type</label>
-        <input type="text" class="form-control" id="vehicle_type" aria-describedby="emailHelp" placeholder="vehicle_type">
-      </div>
-      <div class="form-group">
-        <label for="manufacturer_name">Manufacturer Name</label>
-        <input type="text" class="form-control" id="manufacturer_name" placeholder="manufacturer_name">
-      </div>
-      <div class="form-group">
-        <label for="color">Color</label> #need list of colors
-        <input type="text" class="form-control" id="color" placeholder="color">
-      </div>
-      <div class="form-group">
-        <label for="model_year">Model Year</label>#need model years here
-        <input type="text" class="form-control" id="model_year" placeholder="model_year">
-      </div>
-      <div class="form-group">
-        <label for="keyword">Keyword</label>
-        <input type="text" class="form-control" id="keyword" placeholder="keyword">
-      </div>
-      <button type="submit" class="btn btn-primary">Search</button>
-      </form>
-    </div>
   </div>
+</div>
+<div class="container">
+  <h2>Search Vehicle</h2> 
+  <form>
+    <div class="form-group">
+      <label for="selectVehicleType">Select Vehicle Type</label>
+      <select class="form-control" id="selectVehicleType" name="selectVehicleType">
+        {% for item in vehicle_types %}
+        <option>{{item[0]}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectManufacturer">Select Manufacturer</label>
+      <select class="form-control" id="selectManufacturer" name="selectManufacturer">
+        {% for item in manufacturers %}
+        <option>{{item[0]}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectModelYear">Select Model Year</label>
+      <select class="form-control" id="selectModelYear" name="selectModelYear">
+        {% for item in modelyears %}
+        <option>{{item}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectColor">Select Color</label>
+      <select class="form-control" id="selectColor" name="selectColor">
+        {% for item in colors %}
+        <option>{{item}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+  </form>
+   
+  "All Roles"
+  "Manager"
+  "Clerk"
+  "Sales Person" 
+  <!--More options appear on Search Page-->
+  <!--All authenticated Users see Search by VIN option-->
+  <!--if user.role == 'Inventory Clerk' OR 'Owner':-->
+  <!--  add Vehicle option appears-->
+  <!--  add Repair option appears-->
+  <!--if user.role == 'Manager' OR 'Owner':-->
+  <!--  Reports link appears on page-->
 </div>
 {% endblock %}

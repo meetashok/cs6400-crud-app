@@ -28,32 +28,61 @@ app.config['MYSQL_PORT'] = 3306
 
 # setup session dictionary for user authentication and other session related variables
 session = {
-  "authenticated": False,
-  "username": "user01",
+  "authenticated":False,
+  "failed_authentication":False,
+  "username":None,
   "role": None,
   "previous_page": None,
+  "vin":None,
   "customer": {},
-  "vin": None
 }
 
-# main page with vehicle count, login, and search
+# main page with vehicle count
 @app.route('/', methods=['GET', 'POST'])
 def main():
   print("session:",session,file=sys.stderr)
   cursor = mysql.connection.cursor()
+   
   # count of vehicles for sale
   cursor.execute(sql.count_vehicles_available)
-  count_vehicles_available = cursor.fetchone()
+  tmp = cursor.fetchone()
+  count_vehicles_available = tmp[0] if tmp else None
   print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
-  if count_vehicles_available:
-    count_vehicles_available = count_vehicles_available[0]
-  return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
-
+   
+  # pull vehicletypes for (public) dropdown
+  cursor.execute(sql.get_vehicle_types)
+  vehicle_types = cursor.fetchall()
+  print("vehicle_types:",vehicle_types, file=sys.stderr)
+   
+  # pull manufacturers for (public) dropdown
+  cursor.execute(sql.get_manufacturers)
+  manufacturers = cursor.fetchall()
+  print("manufacturers:",manufacturers, file=sys.stderr)
+   
+  # define static list of vehicle colors (static list provided in specification document)
+  colors = [
+    "Aluminum","Black","Blue","Brown","Bronze","Claret",
+    "Copper","Cream","Gold","Gray","Green","Maroon","Metallic",
+    "Navy","Orange","Pink","Purple","Red","Rose","Rust",
+    "Silver","Tan","Turquoise","White","Yellow"
+  ]
+  # define static list of modelyears from range 1900 to current year + 1
+  modelyears = sorted(list(range(1900, int(datetime.datetime.now().year)+1)), reverse=True) #Should this be +2?
+   
+  session["previous_page"] = "main"
+  return render_template(
+    'main.html',
+    count_vehicles_available=count_vehicles_available,
+    vehicle_types=vehicle_types,
+    manufacturers=manufacturers,
+    colors=colors,
+    modelyears=modelyears,
+    session=session
+  )
+   
 # login handler
 @app.route('/login', methods=['POST'])
 def login():
-  # Output message if something goes wrong...
-  msg = ''
   # Check if "username" and "password" POST requests exist (user submitted form)
   if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
     # Create variables for easy access
@@ -74,23 +103,25 @@ def login():
     if user and user[1] == password:
       # Create session data, we can access this data in other routes
       session["authenticated"] = True
+      session["failed_authentication"] = False
       session["username"] = user[0]
       session["role"] = user[2] 
-      msg = 'Logged in successfully!'
     else:
       # Account doesnt exist or username/password incorrect
-      msg = 'Incorrect username/password!'
-  # Show the login form with message (if any)
-  return redirect(url_for('main'))  
+      session["authenticated"] = False
+      session["failed_authentication"] = True
+  # return redirect(url_for("main"))
+  return redirect(url_for(session["previous_page"]))
 
 # logout handler
 @app.route('/logout', methods=['POST'])
 def logout():
   # remove session data, this will log the user out
   session["authenticated"] = False
-  session["username"] = "guest"
+  session["failed_authentication"] = False
+  session["username"] = None
   session["role"] = None
-  return redirect(url_for('main'))  
+  return redirect(url_for("main"))
 
 ### ##########Search form section
 ### def search():
@@ -118,17 +149,23 @@ def logout():
 ###         else:
 ###             return render_template('main.html', form=form)
 
+@app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
 def repairs(vin="BLANK"):
+  if vin != "BLANK":
+    session["vin"] = vin
+  if session["vin"]:
+    vin = session["vin"]
   form = RepairForm()
   # show repairs info for vin
+  session["previous_page"] = "repairs"
   if request.method == "GET":
     cursor = mysql.connection.cursor()
     cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
     mysql.connection.commit()
-    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
+    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form, session=session)
    
   # add new repair info for vin
   if request.method == "POST":
@@ -258,6 +295,24 @@ def add_manufacturer(previous_page=None):
             return redirect(url_for("main"))
         else:
             return render_template('addmanufacturer.html', form=form)
+
+
+@app.route("/addvehicletype", methods=['GET', 'POST'])
+def add_vehicle_type(previous_page=None):
+    form = VehicleTypeForm()
+    if request.method == "GET":
+        return render_template('addvehicletype.html', form=form)
+    if request.method == "POST":
+        if form.validate() == True:
+            cursor = mysql.connection.cursor()
+            query = "INSERT INTO vehicle_type (vehicle_type) VALUES (%s)"
+            variables = [form.vehicle_type.data]
+            cursor.execute(query, variables)
+            mysql.connection.commit()
+            print("testing", file=sys.stderr)
+            return redirect(url_for("main"))
+        else:
+            return render_template('addvehicletype.html', form=form)
 
 
 @app.route("/purchasevehicle", methods=["GET", "POST"])
