@@ -6,22 +6,39 @@
 <div class="container">
     
     {{ session }}
-        <div class="card w-75">
-                <div class="card-body">
-                  <h5 class="card-title">Customer Information</h5>
-                  {% if session.customer.customer_type %}
-                    <p class="card-text">Type: {{ session.customer.customer_type }}</p>
-                  {% endif %}
-        
-                  {% if session.customer.customer_name %}
-                    <p class="card-text">Name: {{ session.customer.customer_name }}</p>
-                  {% endif %}          
-                  <a class="btn btn-primary" href="{{ '/searchcustomer' }}" >Search customer</a>
-                  <a class="btn btn-primary" href="{{ url_for('addindividual', previous_page='sell') }}" >Add individual</a>
-                  <a class="btn btn-primary" href="{{ url_for('addbusiness', previous_page='sell') }}" >Add business</a>
-        
+    <div class="card">
+            <div class="card-header text-center">
+              Customer information
+            </div>
+            <div class="card-body">
+      
+                <div class="form-row">
+                    <div class="form-group col-md-1"></div>  
+                  <div class="form-group col-md-3">
+                        <a class="btn btn-primary btn-block" href="{{ '/searchcustomer' }}" >Search customer</a>
+                    </div>
+                    <div class="form-group col-md-1 text-center align-self-center"><span class="badge badge-light">OR</span></div>
+                    <div class="form-group col-md-3">
+                        <a class="btn btn-primary btn-block" href="{{ url_for('addindividual', previous_page='sell') }}">Add individual</a>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <a class="btn btn-primary btn-block" href="{{ url_for('addbusiness', previous_page='sell') }}">Add business</a>
+                    </div>
                 </div>
-        </div>
+                
+                {% if customer_type %}
+                <div class="form-group col-12">
+                    <hr>
+                </div>
+                <p class="card-text">Type: {{ customer_type }}</p>
+              {% endif %}
+              {% if customer_name %}
+                <p class="card-text">Name: {{ customer_name }}</p>
+              {% endif %}
+              </div>
+      
+          </div>
+<br>
         <table class="table">
                 <tbody>
                     <tr>

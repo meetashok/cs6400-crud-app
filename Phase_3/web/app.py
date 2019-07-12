@@ -30,7 +30,7 @@ app.config['MYSQL_PORT'] = 3306
 session = {
   "authenticated":False,
   "failed_authentication":False,
-  "username":None,
+  "username":"user01",
   "role": None,
   "previous_page": None,
   "vin":None,

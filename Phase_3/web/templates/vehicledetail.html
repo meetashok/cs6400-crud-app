@@ -15,7 +15,7 @@
     <br>
 
 <div class="card">
-<div class="card-header text-center">
+<div class="card-header text-center alert-primary">
     Vehicle details
 </div>
 <div class="card-body">
@@ -69,6 +69,10 @@
     <th scope="row">Total Repair Cost</th>
     <td>{{ "$ {:,.2f}".format(vehicle_data[11]) }}</td>
 </tr>      
+<tr>
+        <th scope="row">Purchase date</th>
+        <td>{{ seller_data[3].strftime('%Y-%m-%d') }}</td>
+</tr> 
 </tbody>
 </table>
 </div>
@@ -77,99 +81,178 @@
 <br>
 
 <div class="card">
-<div class="card-header text-center">
-Inventory clerk information
+    <div class="card-header text-center alert-primary">
+        Inventory clerk information
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Username</th>
+                    <td>{{ seller_data[2] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Name</th>
+                    <td>{{ seller_data[16] + " " + seller_data[17]  }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<br>
+
+<div class="card">
+<div class="card-header text-center alert-primary">
+    Seller Information
 </div>
 <div class="card-body">
 <table class="table">
 <tbody>
+{% if seller_data[9] %}
 <tr>
-<th scope="row">Username</th>
-<td>{{ seller_data[2] }}</td>
+    <th scope="row">Customer type</th>
+    <td>Business</td>
 </tr>
 <tr>
-<th scope="row">First name</th>
-<td>{{ seller_data[16] }}</td>
+    <th scope="row">Business name</th>
+    <td>{{ seller_data[10] }}</td>
 </tr>
 <tr>
-<th scope="row">Last name</th>
-<td>{{ seller_data[17] }}</td>
+    <th scope="row">Primary contact name</th>
+    <td>{{ seller_data[11] }}</td>
 </tr>
 <tr>
-<th scope="row">Purchase date</th>
-<td>{{ seller_data[3].strftime('%Y-%m-%d') }}</td>
-</tr> 
+    <th scope="row">Primary contact title</th>
+    <td>{{ seller_data[12] }}</td>
+</tr>
+{% endif %}
+{% if seller_data[13] %}
+<tr>
+    <th scope="row">Customer type</th>
+    <td>Individual</td>
+</tr>
+<tr>
+    <th scope="row">Customer name</th>
+    <td>{{ seller_data[14] + " " + seller_data[15]}}</td>
+</tr>
+{% endif %}
+<tr>
+    <th scope="row">Email</th>
+    <td>{{ seller_data[4] }}</td>
+</tr>
+<tr>
+    <th scope="row">Street</th>
+    <td>{{ seller_data[5] }}</td>
+</tr>
+<tr>
+    <th scope="row">City</th>
+    <td>{{ seller_data[6] }}</td>
+</tr>
+<tr>
+    <th scope="row">State</th>
+    <td>{{ seller_data[7] }}</td>
+</tr>
+<tr>
+    <th scope="row">Postal code</th>
+    <td>{{ seller_data[8] }}</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
 
+<br>
+{% if buyer_data[2] %}
 <div class="card">
-        <div class="card-header text-center">
-        Seller Information
+    <div class="card-header text-center alert-primary">
+        Sales person information
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Username</th>
+                    <td>{{ buyer_data[2] }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Name</th>
+                    <td>{{ buyer_data[16] + " " + buyer_data[17]  }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<br>
+
+<div class="card">
+        <div class="card-header text-center alert-primary">
+            Purchaser Information
         </div>
         <div class="card-body">
         <table class="table">
         <tbody>
-        {% if seller_data[9] %}
+        {% if buyer_data[9] %}
         <tr>
             <th scope="row">Customer type</th>
             <td>Business</td>
         </tr>
         <tr>
-        <th scope="row">Business name</th>
-        <td>{{ seller_data[2] }}</td>
+            <th scope="row">Business name</th>
+            <td>{{ buyer_data[10] }}</td>
         </tr>
         <tr>
-        <th scope="row">Primary contact name</th>
-        <td>{{ seller_data[16] }}</td>
+            <th scope="row">Primary contact name</th>
+            <td>{{ buyer_data[11] }}</td>
         </tr>
         <tr>
-        <th scope="row">Primary contact title</th>
-        <td>{{ seller_data[17] }}</td>
+            <th scope="row">Primary contact title</th>
+            <td>{{ buyer_data[12] }}</td>
         </tr>
         {% endif %}
-        {% if seller_data[13] %}
+        {% if buyer_data[13] %}
         <tr>
             <th scope="row">Customer type</th>
             <td>Individual</td>
         </tr>
         <tr>
-        <th scope="row">First name</th>
-        <td>{{ seller_data[2] }}</td>
-        </tr>
-        <tr>
-        <th scope="row">Last name</th>
-        <td>{{ seller_data[16] }}</td>
-        </tr>
-        <tr>
-        <th scope="row">Email</th>
-        <td>{{ seller_data[17] }}</td>
+            <th scope="row">Customer name</th>
+            <td>{{ buyer_data[14] + " " + buyer_data[15]}}</td>
         </tr>
         {% endif %}
         <tr>
-                <th scope="row">Street</th>
-                <td>Business</td>
-            </tr>
-            <tr>
+            <th scope="row">Email</th>
+            <td>{{ buyer_data[4] }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Street</th>
+            <td>{{ buyer_data[5] }}</td>
+        </tr>
+        <tr>
             <th scope="row">City</th>
-            <td>{{ seller_data[2] }}</td>
-            </tr>
-            <tr>
+            <td>{{ buyer_data[6] }}</td>
+        </tr>
+        <tr>
             <th scope="row">State</th>
-            <td>{{ seller_data[16] }}</td>
-            </tr>
-            <tr>
+            <td>{{ buyer_data[7] }}</td>
+        </tr>
+        <tr>
             <th scope="row">Postal code</th>
-            <td>{{ seller_data[17] }}</td>
-            </tr>
+            <td>{{ seller_data[8] }}</td>
+        </tr>
         </tbody>
         </table>
         </div>
         </div>
 
+<br>
+{% endif %}
 
-<a class="btn btn-primary" href="{{ url_for('sellvehiclesubmit') }}" >Sell Vehicle</a>
+{% if not buyer_data[2] %}
+<a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=vehicle_data[0]) }}" >Sell Vehicle</a>
+<a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
+{% endif %}
 </form>
 </div>
 {% endblock %}
