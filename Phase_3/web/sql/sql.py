@@ -3,6 +3,21 @@ class QueryDB:
   def __init__(self):
     pass
 # }}}
+# {{{ check_login_username_and_password()
+  @property
+  def check_login_username_and_password(self):
+    return """
+      SELECT
+        login_username,
+        login_password,
+        role
+      FROM user
+      WHERE
+        login_username = %s AND 
+        login_password = %s
+    """
+# }}}
+# search
 # {{{ count_vehicles_available()
   @property
   def count_vehicles_available(self):
@@ -25,20 +40,23 @@ class QueryDB:
         sale.sales_date IS NULL; 
     """
 # }}}
-# {{{ check_login_username_and_password()
+# {{{ get_vehicle_types()
   @property
-  def check_login_username_and_password(self):
+  def get_vehicle_types(self):
     return """
-      SELECT
-        login_username,
-        login_password,
-        role
-      FROM user
-      WHERE
-        login_username = %s AND 
-        login_password = %s
+      SELECT vehicle_type
+      FROM vehicle_type
     """
 # }}}
+# {{{ get_manufacturers()
+  @property
+  def get_manufacturers(self):
+    return """
+      SELECT manufacturer_name
+      FROM manufacturer
+    """
+# }}}
+# repairs
 # {{{ repairs_show_repairs()
   @property
   def repairs_show_repairs(self):

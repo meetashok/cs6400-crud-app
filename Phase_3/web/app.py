@@ -43,15 +43,44 @@ session = {
 def main():
   print("session:",session,file=sys.stderr)
   cursor = mysql.connection.cursor()
+   
   # count of vehicles for sale
   cursor.execute(sql.count_vehicles_available)
-  count_vehicles_available = cursor.fetchone()
+  tmp = cursor.fetchone()
+  count_vehicles_available = tmp[0] if tmp else None
   print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
-  if count_vehicles_available:
-    count_vehicles_available = count_vehicles_available[0]
+   
+  # pull vehicletypes for (public) dropdown
+  cursor.execute(sql.get_vehicle_types)
+  vehicle_types = cursor.fetchall()
+  print("vehicle_types:",vehicle_types, file=sys.stderr)
+   
+  # pull manufacturers for (public) dropdown
+  cursor.execute(sql.get_manufacturers)
+  manufacturers = cursor.fetchall()
+  print("manufacturers:",manufacturers, file=sys.stderr)
+   
+  # define static list of vehicle colors (static list provided in specification document)
+  colors = [
+    "Aluminum","Black","Blue","Brown","Bronze","Claret",
+    "Copper","Cream","Gold","Gray","Green","Maroon","Metallic",
+    "Navy","Orange","Pink","Purple","Red","Rose","Rust",
+    "Silver","Tan","Turquoise","White","Yellow"
+  ]
+  # define static list of modelyears from range 1900 to current year + 1
+  modelyears = sorted(list(range(1900, int(datetime.datetime.now().year)+1)), reverse=True)
+   
   session["previous_page"] = "main"
-  return render_template('main.html', count_vehicles_available=count_vehicles_available, session=session)  # render main template
-
+  return render_template(
+    'main.html',
+    count_vehicles_available=count_vehicles_available,
+    vehicle_types=vehicle_types,
+    manufacturers=manufacturers,
+    colors=colors,
+    modelyears=modelyears,
+    session=session
+  )
+   
 # login handler
 @app.route('/login', methods=['POST'])
 def login():

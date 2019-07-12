@@ -2,18 +2,55 @@
 
 {% block content %}
 <!-- Page Content -->
-<div class="container">
-  <div class="jumbotron jumbotron-fluid">
-    <div class="container">
-      <h1 class="display-4">Burdell's Ramblin' Wrecks</h1>
-      <p class="lead">
-        Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
-      </p>
-      {% if session.authenticated %}
-      <h3>Search by VIN</h3> 
-      {% endif %}
-    </div>
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h1 class="display-4">Burdell's Ramblin' Wrecks</h1>
+    <p class="lead">
+      Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
+    </p>
+    {% if session.authenticated %}
+    <h3>Search by VIN</h3> 
+    {% endif %}
   </div>
+</div>
+<div class="container">
+  <h2>Search Vehicle</h2> 
+  <form>
+    <div class="form-group">
+      <label for="selectVehicleType">Select Vehicle Type</label>
+      <select class="form-control" id="selectVehicleType" name="selectVehicleType">
+        {% for item in vehicle_types %}
+        <option>{{item[0]}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectManufacturer">Select Manufacturer</label>
+      <select class="form-control" id="selectManufacturer" name="selectManufacturer">
+        {% for item in manufacturers %}
+        <option>{{item[0]}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectModelYear">Select Model Year</label>
+      <select class="form-control" id="selectModelYear" name="selectModelYear">
+        {% for item in modelyears %}
+        <option>{{item}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="selectColor">Select Color</label>
+      <select class="form-control" id="selectColor" name="selectColor">
+        {% for item in colors %}
+        <option>{{item}}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+  </form>
+   
   "All Roles"
   "Manager"
   "Clerk"
