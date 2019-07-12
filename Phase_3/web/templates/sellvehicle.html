@@ -4,16 +4,17 @@
 {% block content %}
 
 <div class="container">
+    
     {{ session }}
         <div class="card w-75">
                 <div class="card-body">
                   <h5 class="card-title">Customer Information</h5>
-                  {% if customer_type %}
-                    <p class="card-text">Type: {{ session.buyer.customer_type }}</p>
+                  {% if session.customer.customer_type %}
+                    <p class="card-text">Type: {{ session.customer.customer_type }}</p>
                   {% endif %}
         
-                  {% if customer_name %}
-                    <p class="card-text">Name: {{ session.buyer.customer_name }}</p>
+                  {% if session.customer.customer_name %}
+                    <p class="card-text">Name: {{ session.customer.customer_name }}</p>
                   {% endif %}          
                   <a class="btn btn-primary" href="{{ '/searchcustomer' }}" >Search customer</a>
                   <a class="btn btn-primary" href="{{ url_for('addindividual', previous_page='sell') }}" >Add individual</a>
@@ -57,7 +58,8 @@
                     </tr>      
                 </tbody>
               </table>
-
-
+        
+              <a class="btn btn-primary" href="{{ url_for('sellvehiclesubmit') }}" >Sell Vehicle</a>
+        </form>
 </div>
 {% endblock %}
