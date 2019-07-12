@@ -16,10 +16,10 @@
 	{% for item in data %}
     {% if item[3] >= 5 %}
       <tr class="bg-danger">
-          <td>{{item[0]}}</td>
-          <td>{{item[1]}}</td>
-          <td>{{item[2]}}</td>
-          <td>{{item[3]}}</td>
+          <td><span class="text-white">{{item[0]}}</span></td>
+          <td><span class="text-white">{{item[1]}}</span></td>
+          <td><span class="text-white">{{item[2]}}</span></td>
+          <td><span class="text-white">{{item[3]}}</span></td>
       </tr> 
     {% endif %}
     {% if item[3] < 5 %}

@@ -4,14 +4,44 @@
 {% block content %}
 
 <div class="container">
-<div class="card card-body">
-<form action="/seachcustomer" method="POST">
-    <div class="form-group">
+  {{ session }}
+    <form action="/searchcustomer" method="POST">
       
-      {{ wtf.quick_form(form) }}
-      
-  </div>
-</form>
+      <div class="form-group">
+          <label for="manufacturer">Choose customer type</label>
+          <select class="form-control" id="customer_type" name="customer_type">
+            <option value="Business">Business</option>
+            <option value="Individual">Individual</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label for="customer_key">Business TIN or Driver's license</label>
+          <input type="text" class="form-control" id="customer_key" aria-describedby="emailHelp" placeholder="Enter TIN or driver's license" name="customer_key">            
+      </div>
+      <button type="submit" class="btn btn-primary">Search customer</button>
+    </form>
+
+    {% if session.customer.customer_type %}
+    <ul class="list-group">
+        <li class="list-group-item">Customer type: {{ session.customer.customer_type }}</li>
+        <li class="list-group-item">Customer ID: {{ session.customer.customer_id }}</li>
+        <li class="list-group-item">Customer type: {{ session.customer.customer_name }}</li>
+    </ul>
+    {% endif %}
+    <br>
+    {% if not session.customer.customer_type %}
+    <ul class="list-group">
+        <li class="list-group-item">Not results</li>
+    </ul>
+    {% endif %}
+    {% if session.customer.customer_type %}
+    {% if session.previous_page == "purchase" %}
+      <a class="btn btn-primary" href="{{ url_for('purchasevehicle') }}" >Select Customer</a>
+    {% else %}
+      <a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=session.vin ) }}" >Select Customer</a>
+    {% endif %}
+    {% endif %}
+
 </div>
-</div>
+
 {% endblock %}

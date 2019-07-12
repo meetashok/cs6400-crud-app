@@ -3,6 +3,117 @@ class QueryDB:
   def __init__(self):
     pass
 # }}}
+# {{{ vehicle_detail_vehicle()
+  @property
+  def vehicle_detail_vehicle(self):
+    return """
+    SELECT
+      vehicle.vin, 
+      manufacturer_name, 
+      vehicle_type,
+      model_year,
+      model_name, 
+      mileage,
+      vehicle_condition,
+      vehicle_description,
+      sales_price,
+      kbb_value,
+      color,
+      repair_cost
+      FROM vehicle
+      LEFT JOIN (
+      SELECT 
+      vin,
+      GROUP_CONCAT(color ORDER BY color ASC SEPARATOR ', ') as color
+      FROM vehicle_color
+      GROUP BY vin
+      ) as vehicle_color_grouped
+      ON vehicle_color_grouped.vin=vehicle.vin
+      LEFT JOIN (
+      SELECT 
+      vin,
+      sum(total_cost) as repair_cost
+      FROM repair
+      GROUP BY vin
+      ) as repair_cost
+      ON vehicle.vin=repair_cost.vin
+      where vehicle.vin = %s
+    """    
+# }}}
+# {{{ vehicle_detail_seller()
+  @property
+  def vehicle_detail_seller(self):
+    return """
+    SELECT
+      vehicle.vin, 
+      purchase.customer_id,
+      purchase.login_username,
+      purchase.purchase_date,
+      customer.email,
+      customer.street,
+      customer.city,
+      customer.state,
+      customer.postal_code,
+      business.tax_id_number,
+      business.business_name,
+      business.pc_name,
+      business.pc_title, 
+      individual.driver_license_number,
+      individual.individual_first_name,
+      individual.individual_last_name,
+      user.user_first_name,
+      user.user_last_name
+      FROM vehicle
+      LEFT JOIN purchase
+      ON vehicle.vin = purchase.vin
+      LEFT JOIN customer
+      ON purchase.customer_id = customer.customer_id
+      LEFT JOIN individual
+      ON customer.customer_id = individual.customer_id
+      LEFT JOIN business
+      ON customer.customer_id = business.customer_id
+      LEFT JOIN user
+      ON purchase.login_username = user.login_username
+      where vehicle.vin = %s
+    """    
+# }}}
+# {{{ vehicle_detail_buyer()
+  @property
+  def vehicle_detail_buyer(self):
+    return """
+    SELECT
+      vehicle.vin, 
+      sale.customer_id,
+      sale.login_username,
+      sale.sales_date,
+      customer.email,
+      customer.street,
+      customer.city,
+      customer.state,
+      customer.postal_code,
+      business.tax_id_number,
+      business.business_name,
+      business.pc_name,
+      business.pc_title, 
+      individual.driver_license_number,
+      individual.individual_first_name,
+      individual.individual_last_name,
+      user.user_first_name,
+      user.user_last_name
+      FROM vehicle
+      LEFT JOIN sale
+      ON vehicle.vin = sale.vin
+      LEFT JOIN customer
+      ON sale.customer_id = customer.customer_id
+      LEFT JOIN individual
+      ON customer.customer_id = individual.customer_id
+      LEFT JOIN business
+      ON customer.customer_id = business.customer_id
+      LEFT JOIN user
+      ON sale.login_username = user.login_username
+      where vehicle.vin = %s
+    """    
+# }}}
 # {{{ check_login_username_and_password()
   @property
   def check_login_username_and_password(self):
@@ -247,6 +358,7 @@ class QueryDB:
     """
 # }}}
 # {{{ reports_monthly_sales_drilldown()
+  @property
   def reports_monthly_sales_drilldown(self, yearmonth):
     return """
     SELECT
@@ -265,4 +377,19 @@ class QueryDB:
     ORDER BY
      number_of_vehicles DESC,
      total_sales DESC"""
+# }}}
+# {{{ reports_monthly_sales_drilldown()
+  @property
+  def search_vendor(self, vendor_name):
+    return """
+    SELECT
+      vendor_name,
+      vendor_phone_number,
+      street,
+      city,
+      state,
+      postal_code
+    FROM ​vendor 
+    WHERE
+      vendor_name=​""" +vendor_name
 # }}}

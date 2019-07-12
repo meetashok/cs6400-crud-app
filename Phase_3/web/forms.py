@@ -73,3 +73,6 @@ class ManufacturerForm(FlaskForm):
 
 class VehicleTypeForm(FlaskForm):
     vehicle_type = StringField("Enter new vehicle type", validators=[DataRequired()])
+
+class VendorSearchForm(FlaskForm):
+    vendor_name = StringField("Search Vendor by name", validators=[DataRequired()])
