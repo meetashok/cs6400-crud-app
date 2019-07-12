@@ -4,25 +4,7 @@
 <!-- Page Content -->
 <div class="container">
   <h1 class="mt-4">Burdell's Ramblin' Wrecks</h1>
-  <p>Welcome {{ session.username }}!</p>
-  <p>TEST: {{ session }}!</p>
   <p>Number of cars available for purchase: <b>{{ count_vehicles_available }}</b></p>
-  <p>
-    {% if not session.authenticated %}
-    <form action="/login" method="post">
-      <input type="text" placeholder="Username" name="username" value="{{
-        request.form.username }}">
-       <input type="password" placeholder="Password" name="password" value="{{
-        request.form.password }}">
-      <input class="btn btn-default" type="submit" value="Login">
-    </form>
-    {% endif %}
-    {% if session.authenticated %}
-    <form action="/logout" method="post">
-      <input class="btn btn-default" type="submit" value="Logout">
-    </form>
-    {% endif %}
-  </p>
   <div class="collapse" id="collapseExample">
     <div class="card card-body">
       <form action="/" method="POST">

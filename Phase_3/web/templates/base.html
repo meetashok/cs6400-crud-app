@@ -36,7 +36,7 @@
             <form action="/login" method="post">
               <input type="text" placeholder="Username" name="username" value="{{ request.form.username }}" required>
                <input type="password" placeholder="Password" name="password" value="{{ request.form.password }}" required>
-              <input class="btn btn-primary" type="submit" value="Authenticate">
+              <input class="btn btn-secondary" type="submit" value="Authenticate">
             </form> 
           </div>
         </div>
@@ -55,17 +55,15 @@
         {% endif %}
         {% if session.authenticated %}
         <li class="nav-item">
-          <span class="badge badge-info">Welcome {{session.username}}!</span>
+          <span class="nav-link"><span class="text-info">Welcome {{session.username}}!</span></span>
         </li>
         {% endif %}
-        <li class="nav-item">
-          <a href="#" class="badge badge-pill badge-warning" data-toggle="collapse" data-target="#collapseDebug" aria-expanded="false" aria-controls="collapseDebug">+debug</a>
-          <div class="collapse" id="collapseDebug">
-            <div class="alert alert-warning" role="alert">{{ session }}</div>
-          </div>
-        </li>
       </ul>
     </div>
+  </div>
+  <a href="#" class="badge badge-pill badge-warning" data-toggle="collapse" data-target="#collapseDebug" aria-expanded="false" aria-controls="collapseDebug">+debug</a>
+  <div class="collapse" id="collapseDebug">
+    <div class="alert alert-warning" role="alert">{{ session }}</div>
   </div>
 </nav>
 {% block content %} {% endblock %}
