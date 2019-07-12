@@ -50,7 +50,7 @@
         {% endif %}
         {% if session.failed_authentication %}
         <li class="nav-item">
-          <div class="alert alert-danger" role="alert">Incorrect username/password!</div>
+          <span class="nav-link"><span class="badge badge-danger">Incorrect username/password!</span></span>
         </li>
         {% endif %}
         {% if session.authenticated %}
