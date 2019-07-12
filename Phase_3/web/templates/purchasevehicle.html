@@ -1,10 +1,13 @@
 {% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
 
 {% block content %}
 
 <div class="container">
     <p>{{ session }} </p>
+    <p>{{ session.seller }} </p>
+    <p>{{ session.previous_page }} </p>
+    <p>Welcome {{ session.username }}!</p>
+  <p>TEST: {{ session }}!</p>
 <div class="card card-body">
     <ul class="list-group">
         {% for error in errors %}

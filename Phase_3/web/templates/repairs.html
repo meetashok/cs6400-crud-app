@@ -2,8 +2,9 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 
 {% block content %}
-<!-- Page Content -->
+
 <div class="container">
+    {{ session }}
   <h1 class="mt-4">Repairs!</h1>
   {% if vin=='BLANK' %}
   <p>no vin provided!...</p>

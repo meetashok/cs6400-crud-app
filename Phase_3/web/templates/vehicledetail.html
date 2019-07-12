@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block content %}
+
+<div class="container">
+    
+    {{ session }}
+    <br>
+    {{ vehicle_data }}
+    <br>
+    {{ seller_data }}
+    <br>
+    {{ buyer_data }}
+    <br>
+
+<div class="card">
+<div class="card-header text-center">
+    Vehicle details
+</div>
+<div class="card-body">
+<table class="table">
+<tbody>
+<tr>
+    <th scope="row">VIN</th>
+    <td>{{ vehicle_data[0] }}</td>
+</tr>
+<tr>
+    <th scope="row">Manufacturer</th>
+    <td>{{ vehicle_data[1] }}</td>
+</tr>
+<tr>
+    <th scope="row">Vehicle type</th>
+    <td>{{ vehicle_data[2] }}</td>
+</tr>
+<tr>
+    <th scope="row">Year</th>
+    <td>{{ vehicle_data[3] }}</td>
+</tr>
+<tr>
+    <th scope="row">Model</th>
+    <td>{{ vehicle_data[4] }}</td>
+</tr>
+<tr>
+    <th scope="row">Mileage</th>
+    <td>{{ "{:,.0f}".format(vehicle_data[5]) }}</td>
+</tr>
+<tr>
+    <th scope="row">Condition</th>
+    <td>{{ vehicle_data[6] }}</td>
+</tr>
+<tr>
+    <th scope="row">Description</th>
+    <td>{{ vehicle_data[7] }}</td>
+</tr>      
+<tr>
+    <th scope="row">Sales Price</th>
+    <td>{{ "$ {:,.2f}".format(vehicle_data[8]) }}</td>
+</tr>      
+<tr>
+    <th scope="row">Purchase Price</th>
+    <td>{{ "$ {:,.2f}".format(vehicle_data[9]) }}</td>
+</tr>      
+<tr>
+    <th scope="row">Colors</th>
+    <td>{{ vehicle_data[10] }}</td>
+</tr>      
+<tr>
+    <th scope="row">Total Repair Cost</th>
+    <td>{{ "$ {:,.2f}".format(vehicle_data[11]) }}</td>
+</tr>      
+</tbody>
+</table>
+</div>
+</div>
+
+<br>
+
+<div class="card">
+<div class="card-header text-center">
+Inventory clerk information
+</div>
+<div class="card-body">
+<table class="table">
+<tbody>
+<tr>
+<th scope="row">Username</th>
+<td>{{ seller_data[2] }}</td>
+</tr>
+<tr>
+<th scope="row">First name</th>
+<td>{{ seller_data[16] }}</td>
+</tr>
+<tr>
+<th scope="row">Last name</th>
+<td>{{ seller_data[17] }}</td>
+</tr>
+<tr>
+<th scope="row">Purchase date</th>
+<td>{{ seller_data[3].strftime('%Y-%m-%d') }}</td>
+</tr> 
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+        <div class="card-header text-center">
+        Seller Information
+        </div>
+        <div class="card-body">
+        <table class="table">
+        <tbody>
+        {% if seller_data[9] %}
+        <tr>
+            <th scope="row">Customer type</th>
+            <td>Business</td>
+        </tr>
+        <tr>
+        <th scope="row">Business name</th>
+        <td>{{ seller_data[2] }}</td>
+        </tr>
+        <tr>
+        <th scope="row">Primary contact name</th>
+        <td>{{ seller_data[16] }}</td>
+        </tr>
+        <tr>
+        <th scope="row">Primary contact title</th>
+        <td>{{ seller_data[17] }}</td>
+        </tr>
+        {% endif %}
+        {% if seller_data[13] %}
+        <tr>
+            <th scope="row">Customer type</th>
+            <td>Individual</td>
+        </tr>
+        <tr>
+        <th scope="row">First name</th>
+        <td>{{ seller_data[2] }}</td>
+        </tr>
+        <tr>
+        <th scope="row">Last name</th>
+        <td>{{ seller_data[16] }}</td>
+        </tr>
+        <tr>
+        <th scope="row">Email</th>
+        <td>{{ seller_data[17] }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+                <th scope="row">Street</th>
+                <td>Business</td>
+            </tr>
+            <tr>
+            <th scope="row">City</th>
+            <td>{{ seller_data[2] }}</td>
+            </tr>
+            <tr>
+            <th scope="row">State</th>
+            <td>{{ seller_data[16] }}</td>
+            </tr>
+            <tr>
+            <th scope="row">Postal code</th>
+            <td>{{ seller_data[17] }}</td>
+            </tr>
+        </tbody>
+        </table>
+        </div>
+        </div>
+
+
+<a class="btn btn-primary" href="{{ url_for('sellvehiclesubmit') }}" >Sell Vehicle</a>
+</form>
+</div>
+{% endblock %}
