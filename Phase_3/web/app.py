@@ -111,7 +111,6 @@ def login():
       # Account doesnt exist or username/password incorrect
       session["authenticated"] = False
       session["failed_authentication"] = True
-  # return redirect(url_for("main"))
   return redirect(url_for(session["previous_page"]))
 
 # logout handler
@@ -480,15 +479,12 @@ def get_AvgTimeInInventory():
     data = cursor.fetchall()
     return render_template("display_avg_time_in_inventory_table.html", data=data)
 
-
 @app.route('/report/priceperrepair', methods=['GET'])
 def get_PricePerRepair():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_price_per_repair)
     data = cursor.fetchall()
     return render_template("display_price_per_repair_table.html", data=data)
-
-
 
 @app.route('/report/repairstatistics', methods=['GET'])
 def get_RepairStats():
@@ -497,8 +493,6 @@ def get_RepairStats():
     data = cursor.fetchall()
     return render_template("display_repair_stats_table.html", data=data)
 
-
-
 @app.route('/report/monthlysales', methods=['GET'])
 def get_MonthlySales():
     cursor = mysql.connection.cursor()
@@ -506,8 +500,6 @@ def get_MonthlySales():
     cursor.execute(sql.reports_monthly_sales)
     data = cursor.fetchall()
     return render_template("display_monthly_sales_table.html", data=data)
-
-
 
 @app.route('/report/monthlysalesdrilldown/yearmonth=<string:yearmonth>', methods=['GET'])
 def get_MonthlySalesDrilldown(yearmonth=None):
