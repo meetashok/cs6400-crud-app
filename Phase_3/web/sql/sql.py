@@ -229,6 +229,7 @@ class QueryDB:
     """
 # }}}
 # {{{ reports_monthly_sales_drilldown()
+  @property
   def reports_monthly_sales_drilldown(self, yearmonth):
     return """
     SELECT
@@ -247,4 +248,19 @@ class QueryDB:
     ORDER BY
      number_of_vehicles DESC,
      total_sales DESC"""
+# }}}
+# {{{ reports_monthly_sales_drilldown()
+  @property
+  def search_vendor(self, vendor_name):
+    return """
+    SELECT
+      vendor_name,
+      vendor_phone_number,
+      street,
+      city,
+      state,
+      postal_code
+    FROM ​vendor 
+    WHERE
+      vendor_name=​""" +vendor_name
 # }}}

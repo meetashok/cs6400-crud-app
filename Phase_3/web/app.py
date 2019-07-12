@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_mysqldb import MySQL
 from flask_bootstrap import Bootstrap
 from flask_wtf import FlaskForm
-from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm, ManufacturerForm, VehicleTypeForm
+from forms import IndividualForm, BusinessForm, RepairForm, VendorForm, CustomerSearchForm, VehicleForm, ManufacturerForm, VehicleTypeForm, VendorSearchForm
 
 # import sql templating class
 from  sql.sql import QueryDB
@@ -413,6 +413,16 @@ def searchcustomer():
   #       if form.validate() == True:
   #             cursor = mysql.connection.cursor()
   #             cursor.execute("SELECT customer_id ")
+
+
+@app.route("/searchvendor", methods=["GET", "POST"])
+def searchvendor(vendor_name=None):
+    form = VendorSearchForm()
+    cursor = mysql.connection.cursor()
+    cursor.execute(sql.search_vendor(vendor_name))
+    data = cursor.fetchall()
+    return render_template('searchvendor.html', form=form, data=data)
+
 
 @app.route('/dropdown', methods=['GET', 'POST'])
 def dropdown():

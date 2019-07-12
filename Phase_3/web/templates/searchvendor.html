@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<!-- Page Content -->
+
+<div class="container">
+  <form action="/addmanufacturer" method="POST">
+    <div class="form-group">
+      
+      {{ wtf.quick_form(form) }}
+      <input type=submit class='btn btn-primary btn-block'>
+    </div>
+  </form>
+  <h1 class="mt-4">Monthly Sales Report Drilldown!</h1>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Vendor Name</th>
+      <th scope="col">Vendor Phone Number</th>
+      <th scope="col">Street</th>
+      <th scope="col">City</th>
+      <th scope="col">State</th>
+      <th scope="col">Postal Code</th>
+    </tr>
+    {% for item in data %}
+    <tr>
+      <td onclick="location.href='/searchvendor/vendor_name={{item[0]}}'"><a href="searchvendor/vendor_name={{item[0]}}">>{{item[0]}}</td>
+      <td>{{item[1]}}</td>
+      <td>{{item[2]}}</td>
+      <td>{{item[3]}}</td>
+      <td>{{item[4]}}</td>
+      <td>{{item[5]}}</td>
+    </tr>
+    {% endfor %}
+  </thead>
+  <tbody>
+  </tbody>
+  </table>
+</div>
+{% endblock %}
