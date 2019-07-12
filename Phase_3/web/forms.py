@@ -35,7 +35,6 @@ class IndividualForm(FlaskForm):
     driver_license_number = StringField("Driver license number", validators=[DataRequired()])
     individual_first_name = StringField("First name", validators=[DataRequired()])
     individual_last_name = StringField("Last name", validators=[DataRequired()])
-    submit = SubmitField("Save")
 
 class BusinessForm(FlaskForm):
     phone_number = StringField("Phone number", validators=[DataRequired()])
@@ -70,8 +69,7 @@ class RepairForm(FlaskForm):
     repair_description = StringField("Description", validators=[DataRequired()])
 
 class ManufacturerForm(FlaskForm):
-    manufacturer_name = StringField("Manufacturer name", validators=[DataRequired()])
-    submit = SubmitField("Save")
+    manufacturer_name = StringField("Enter new manufacturer name", validators=[DataRequired()])
 
 class VehicleTypeForm(FlaskForm):
-    vehicle_type = StringField("Vehicle type", validators=[DataRequired()])
+    vehicle_type = StringField("Enter new vehicle type", validators=[DataRequired()])

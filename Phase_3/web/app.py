@@ -263,6 +263,24 @@ def add_manufacturer(previous_page=None):
             return render_template('addmanufacturer.html', form=form)
 
 
+@app.route("/addvehicletype", methods=['GET', 'POST'])
+def add_vehicle_type(previous_page=None):
+    form = VehicleTypeForm()
+    if request.method == "GET":
+        return render_template('addvehicletype.html', form=form)
+    if request.method == "POST":
+        if form.validate() == True:
+            cursor = mysql.connection.cursor()
+            query = "INSERT INTO vehicle_type (vehicle_type) VALUES (%s)"
+            variables = [form.vehicle_type.data]
+            cursor.execute(query, variables)
+            mysql.connection.commit()
+            print("testing", file=sys.stderr)
+            return redirect(url_for("main"))
+        else:
+            return render_template('addvehicletype.html', form=form)
+
+
 @app.route("/purchasevehicle", methods=["GET", "POST"])
 def purchasevehicle():
       errors = []
