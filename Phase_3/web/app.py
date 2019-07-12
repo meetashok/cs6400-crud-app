@@ -30,7 +30,7 @@ app.config['MYSQL_PORT'] = 3306
 session = {
   "authenticated":False,
   "failed_authentication":False,
-  "username":"guest",
+  "username":None,
   "role": None,
   "previous_page": None,
   "vin":None,
@@ -38,7 +38,7 @@ session = {
   "seller": {}
 }
 
-# main page with vehicle count, login, and search
+# main page with vehicle count
 @app.route('/', methods=['GET', 'POST'])
 def main():
   print("session:",session,file=sys.stderr)
@@ -55,8 +55,6 @@ def main():
 # login handler
 @app.route('/login', methods=['POST'])
 def login():
-  # Output message if something goes wrong...
-  msg = ''
   # Check if "username" and "password" POST requests exist (user submitted form)
   if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
     # Create variables for easy access
@@ -80,24 +78,21 @@ def login():
       session["failed_authentication"] = False
       session["username"] = user[0]
       session["role"] = user[2] 
-      msg = 'Logged in successfully!'
     else:
       # Account doesnt exist or username/password incorrect
       session["authenticated"] = False
       session["failed_authentication"] = True
-      msg = 'Incorrect username/password!'
-  # Show the login form with message (if any)
-  # return redirect(url_for(session["previous_page"]))
-  return redirect(url_for("main"))
+  # return redirect(url_for("main"))
+  return redirect(url_for(session["previous_page"]))
 
 # logout handler
 @app.route('/logout', methods=['POST'])
 def logout():
   # remove session data, this will log the user out
   session["authenticated"] = False
-  session["username"] = "guest"
+  session["failed_authentication"] = False
+  session["username"] = None
   session["role"] = None
-  # return redirect(url_for(session["previous_page"]))  
   return redirect(url_for("main"))
 
 ### ##########Search form section
@@ -142,7 +137,7 @@ def repairs(vin="BLANK"):
     cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
     mysql.connection.commit()
-    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
+    return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form, session=session)
    
   # add new repair info for vin
   if request.method == "POST":
