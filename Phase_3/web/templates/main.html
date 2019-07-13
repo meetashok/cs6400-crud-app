@@ -9,15 +9,17 @@
       Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
     </p>
     {% if session.authenticated %}
-    <small><i>authenticated searches</i></small>
-    <h3>Search by VIN</h3>
-    {% if session.role == "All Roles"%} 
+    <small><i>authenticated options</i></small>
+    <h3>
+      <span>Search by VIN</span>
+      <button class='btn btn-primary pull-right'>Button Text</button>
+    </h3>
+    {% if session.role == "Manager" or session.role == "All Roles"%} 
+    <h3>Management Reports</h3>
     {% endif %}
-    {% if session.role == "Manager"%} 
-    {% endif %}
-    {% if session.role == "Clerk"%} 
-    {% endif %}
-    {% if session.role == "Sales Person"%} 
+    {% if session.role == "Clerk" or session.role == "All Roles"%} 
+    <h3>Inventory: Add Vehicle</h3>
+    <h3>Inventory: Add Repair</h3>
     {% endif %}
      
     <!--More options appear on Search Page-->
