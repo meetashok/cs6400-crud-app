@@ -6,17 +6,17 @@
   <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">Year Month</th>
-      <th scope="col">Number Of Vehicles</th>
-      <th scope="col">Sales Revenue</th>
-      <th scope="col">Net Income</th>
+      <th class="text-center" scope="col">Year Month</th>
+      <th class="text-center"  scope="col">Number Of Vehicles</th>
+      <th  class="text-center" scope="col">Sales Revenue</th>
+      <th  class="text-center" scope="col">Net Income</th>
     </tr>
     {% for item in data %}
     <tr>
-      <td onclick="location.href='/report/monthlysalesdrilldown/yearmonth={{item[0]}}'"><a href="http://127.0.0.1:5000/report/monthlysalesdrilldown/yearmonth={{item[0]}}">{{item[0]}}</a></td>
-      <td>{{item[1]}}</td>
-      <td>{{item[2]}}</td>
-      <td>{{item[3]}}</td>
+      <td  class="text-center" onclick="location.href='/report/monthlysalesdrilldown/yearmonth={{item[0]}}'"><a href="http://127.0.0.1:5000/report/monthlysalesdrilldown/yearmonth={{item[0]}}">{{item[0]}}</a></td>
+      <td class="text-center" >{{item[1]}}</td>
+      <td class="text-center" >{{"$ {:,.0f}".format(item[2]) }}</td>
+      <td class="text-center" >{{"$ {:,.0f}".format(item[3]) }}</td>
     </tr>
     {% endfor %}
   </thead>

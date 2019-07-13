@@ -7,9 +7,9 @@
   <thead>
     <tr>
       <th scope="col">Customer Name</th>
-      <th scope="col">Vehicles Sold</th>
-      <th scope="col">Avg Purchase Price</th>
-      <th scope="col">Avg Number of Repairs</th>
+      <th class="text-center" scope="col">Vehicles Sold</th>
+      <th class="text-center" scope="col">Avg Purchase Price</th>
+      <th class="text-center" scope="col">Avg Number of Repairs</th>
     </tr>
   </thead>
   <tbody id="tby1">
@@ -17,17 +17,18 @@
     {% if item[3] >= 5 %}
       <tr class="bg-danger">
           <td><span class="text-white">{{item[0]}}</span></td>
-          <td><span class="text-white">{{item[1]}}</span></td>
-          <td><span class="text-white">{{item[2]}}</span></td>
-          <td><span class="text-white">{{item[3]}}</span></td>
+          <td class="text-center"><span class="text-white">{{item[1]}}</span></td>
+          <td class="text-center"><span class="text-white">{{ "$ {:,.2f}".format(item[2]) }}</span></td>
+          
+          <td class="text-center"><span class="text-white">{{item[3]}}</span></td>
       </tr> 
     {% endif %}
     {% if item[3] < 5 %}
       <tr>
           <td>{{item[0]}}</td>
-          <td>{{item[1]}}</td>
-          <td>{{item[2]}}</td>
-          <td>{{item[3]}}</td>
+          <td class="text-center">{{item[1]}}</td>
+          <td class="text-center">{{ "$ {:,.2f}".format(item[2]) }}</td>
+          <td class="text-center">{{item[3]}}</td>
       </tr>
     {% endif %}
 	{% endfor %}

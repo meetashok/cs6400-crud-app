@@ -19,7 +19,7 @@ class QueryDB:
       sales_price,
       kbb_value,
       color,
-      repair_cost
+      coalesce(repair_cost, 0)
       FROM vehicle
       LEFT JOIN (
       SELECT 
@@ -313,7 +313,7 @@ class QueryDB:
 # {{{ reports_repair_statistics()
   @property
   def reports_repair_statistics(self):
-    return """ SELECT
+    return """SELECT
     vendor_name,
     COUNT(*) AS number_of_repairs, 
     SUM(total_cost) AS total_spend,
@@ -321,7 +321,7 @@ class QueryDB:
     AVG(DATEDIFF(repair_end_date, repair_start_date)) AS avg_duration
     FROM repair
     WHERE
-      repair_status='Complete'
+      repair_status='completed'
     GROUP BY vendor_name"""
 # }}}
 # {{{ reports_monthly_sales()
