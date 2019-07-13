@@ -35,12 +35,12 @@ session = {
   "previous_page": None,
   "vin":None,
   "customer": {},
+  "search_result":[]
 }
 
 # main page with vehicle count
 @app.route('/', methods=['GET', 'POST'])
 def main():
-  print("session:",session,file=sys.stderr)
   cursor = mysql.connection.cursor()
    
   # count of vehicles for sale
@@ -122,31 +122,28 @@ def logout():
   session["role"] = None
   return redirect(url_for("main"))
 
-### ##########Search form section
-### def search():
-###     form = SearchForm()
-###     if request.method == "GET":
-###         return render_template('main.html', form=form)
-### 
-###     if request.method == "POST":
-###         if form.validate() == True:
-###             vehicle_type = form.vehicle_type.data
-###             manufacturer_name = form.manufacturer_name.data
-###             color = form.color.data
-###             model_year = form.model_year.data
-###             keyword = form.keyword.data
-### 
-###             
-###             cursor = mysql.connection.cursor()
-###             query2 = "SELECT * FROM vehicle"
-###             #variables = vehicle_type, manufacturer_name, color, model_year, keyword
-###             cursor.execute((query, variables))
-###             mysql.connection.commit()
-###             # return render_template('welcome.html', query="query")
-###             return redirect(url_for("main"))
-### 
-###         else:
-###             return render_template('main.html', form=form)
+# vehicle search
+@app.route('/search', methods=["GET","POST"])
+def search():
+  if request.method == "GET":
+    return render_template('main.html')
+   
+  if request.method == "POST":
+    vehicle_type = request.form['vehicle_type']
+    manufacturer = request.form['manufacturer']
+    model_year = request.form['model_year']
+    color = request.form['color']
+    keyword = request.form['keyword']
+     
+    cursor = mysql.connection.cursor()
+    query_vars = [vehicle_type, manufacturer, color, model_year, keyword] 
+    print("sql.vehicle_search:",sql.vehicle_search,file=sys.stderr)
+    print("query_vars:",query_vars,file=sys.stderr)
+    # cursor.execute(sql.vehicle_search, query_vars)
+    cursor.execute(sql.vehicle_search,[vehicle_type])
+    search_result = cursor.fetchall()
+    session["search_result"] = search_result 
+    return redirect(url_for("main"))
 
 @app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin

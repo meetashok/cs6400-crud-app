@@ -2,7 +2,7 @@
 
 {% block content %}
 <!-- Page Content -->
-<div class="jumbotron jumbotron-fluid">
+<div class="jumbotron jumbotron-fluid" style="padding-top: 10px; padding-bottom: 10px;">
   <div class="container">
     <h1 class="display-4">Welcome!</h1>
     <p class="lead">
@@ -13,48 +13,113 @@
     {% endif %}
   </div>
 </div>
-<div class="container">
-  <h2>Search Vehicle</h2> 
-  <form>
+<div class="container-fluid">
+  <div class="container">
+  <h2>Search Vehicle Inventory</h2> 
+  <form action="/search" method="post">
     <div class="form-group">
-      <label for="selectVehicleType">Select Vehicle Type</label>
-      <select class="form-control" id="selectVehicleType" name="selectVehicleType">
+      <label for="vehicle_type">Vehicle Type</label>
+      <select class="form-control" id="vehicle_type" name="vehicle_type">
+        <option value='%' selected>All Vehicle Types</option>
+        <option disabled>_________</option>
         {% for item in vehicle_types %}
-        <option>{{item[0]}}</option>
+        <option value={{item[0]}}>{{item[0]}}</option>
         {% endfor %}
       </select>
     </div>
     <div class="form-group">
-      <label for="selectManufacturer">Select Manufacturer</label>
-      <select class="form-control" id="selectManufacturer" name="selectManufacturer">
+      <label for="manufacturer">Manufacturer</label>
+      <select class="form-control" id="manufacturer" name="manufacturer">
+        <option value='%' selected>All Manufacturers</option>
+        <option disabled>_________</option>
         {% for item in manufacturers %}
-        <option>{{item[0]}}</option>
+        <option value={{item[0]}}>{{item[0]}}</option>
         {% endfor %}
       </select>
     </div>
     <div class="form-group">
-      <label for="selectModelYear">Select Model Year</label>
-      <select class="form-control" id="selectModelYear" name="selectModelYear">
+      <label for="model_year">Model Year</label>
+      <select class="form-control" id="model_year" name="model_year">
+        <option value='%' selected>All Model Years</option>
+        <option disabled>_________</option>
         {% for item in modelyears %}
-        <option>{{item}}</option>
+        <option value={{item[0]}}>{{item}}</option>
         {% endfor %}
       </select>
     </div>
     <div class="form-group">
-      <label for="selectColor">Select Color</label>
-      <select class="form-control" id="selectColor" name="selectColor">
+      <label for="color">Color</label>
+      <select class="form-control" id="color" name="color">
+        <option value='%' selected>All Colors</option>
+        <option disabled>_________</option>
         {% for item in colors %}
-        <option>{{item}}</option>
+        <option value={{item[0]}}>{{item}}</option>
         {% endfor %}
       </select>
     </div>
-
+    <div class="form-group">
+      <label for="keyword">Keyword Search</label>
+      <input type="text" class="form-control" id="Keyword" placeholder="keyword search" name="keyword">
+    </div>
+    <div class="form-group">
+      <input class="btn btn-warning" type="submit" value="Search">
+    </div>
   </form>
+  </div>
    
-  "All Roles"
-  "Manager"
-  "Clerk"
-  "Sales Person" 
+  {% if session.search_result|length > 0 %}
+  <div class="container-fluid">
+  <h2>Search returned {{session.search_result|length}} results</h2> 
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">VIN</th>
+      <th scope="col">Vehicle Type</th>
+      <th scope="col">Model Year</th>
+      <th scope="col">Manufacturer</th>
+      <th scope="col">Model</th>
+      <th scope="col">Color</th>
+      <th scope="col">Mileage</th>
+      <th scope="col">Sales Price</th>
+      <th scope="col">Vehicle Condition</th>
+      <th scope="col">Vehicle Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in session.search_result %}
+    <tr>
+	    <td><input class="btn btn-link" type="submit" value="{{item[0]}}"></td>
+	    <td>{{item[1]}}</td>
+	    <td>{{item[2]}}</td>
+	    <td>{{item[3]}}</td>
+	    <td>{{item[4]}}</td>
+	    <td>{{item[5]}}</td>
+	    <td>{{item[6]}}</td>
+	    <td>{{item[7]}}</td>
+	    <td>{{item[8]}}</td>
+	    <td>{{item[9]}}</td>
+	    <td>{{item[10]}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+  </div>
+  {% endif %}
+  {% if session.search_result|length == 0 %}
+  <div class="container">
+    <h2>Sorry, looks like we don’t have that in stock! </h2> 
+  </div>
+  {% endif %}
+   
+  <div>
+  <p>
+    <br/>
+    "All Roles"<br/>
+    "Manager"<br/>
+    "Clerk"<br/>
+    "Sales Person"<br/>
+  </p>
+  </div>
   <!--More options appear on Search Page-->
   <!--All authenticated Users see Search by VIN option-->
   <!--if user.role == 'Inventory Clerk' OR 'Owner':-->

@@ -167,6 +167,92 @@ class QueryDB:
       FROM manufacturer
     """
 # }}}
+# {{{ vehicle_search()
+  @property
+  def vehicle_search(self):
+    """
+      SELECT
+        vehicle.vin,
+        vehicle.vehicle_type,
+        vehicle.model_year,
+        vehicle.manufacturer_name,
+        vehicle.model_name,
+        vehicle_color_grouped.color,
+        vehicle.mileage,
+        vehicle.sales_price,
+        vehicle.vehicle_condition,
+        vehicle.vehicle_description
+      FROM vehicle
+      LEFT JOIN (
+        SELECT
+          vin,
+          GROUP_CONCAT(color ORDER BY color ASC SEPARATOR ',') as color
+        FROM vehicle_color
+        GROUP BY vin
+      ) as vehicle_color_grouped
+      ON vehicle_color_grouped.vin=vehicle.vin
+      LEFT JOIN
+      (
+        SELECT
+          distinct(vin) as vin
+        FROM repair
+        WHERE repair_status IN ('In Progress','Pending')
+      ) vehicle_in_repair
+      ON vehicle.vin=vehicle_in_repair.vin
+      LEFT JOIN sale
+      ON vehicle.vin=sale.vin
+      WHERE
+        vehicle_in_repair.vin IS NULL AND
+        sale.sales_date IS NULL AND
+        vehicle_type=%s AND
+        manufacturer_name= '{manufacturer_name}' AND
+        model_year= '{model_year}' AND
+        vehicle_type= '{vehicle_type}' AND
+        color LIKE '% {color} %' AND
+        (
+          manufacturer_name LIKE '%{ keyword} %' OR
+          model_year LIKE '% {keyword} %' OR
+          vehicle_description LIKE '% {keyword }%' OR
+          model_name LIKE '% {keyword} %'
+        )
+    """
+    return """
+      SELECT
+        vehicle.vin,
+        vehicle.vehicle_type,
+        vehicle.model_year,
+        vehicle.manufacturer_name,
+        vehicle.model_name,
+        vehicle_color_grouped.color,
+        vehicle.mileage,
+        vehicle.sales_price,
+        vehicle.vehicle_condition,
+        vehicle.vehicle_description
+      FROM vehicle
+      LEFT JOIN (
+        SELECT
+          vin,
+          GROUP_CONCAT(color ORDER BY color ASC SEPARATOR ',') as color
+        FROM vehicle_color
+        GROUP BY vin
+      ) as vehicle_color_grouped
+      ON vehicle_color_grouped.vin=vehicle.vin
+      LEFT JOIN
+      (
+        SELECT
+          distinct(vin) as vin
+        FROM repair
+        WHERE repair_status IN ('In Progress','Pending')
+      ) vehicle_in_repair
+      ON vehicle.vin=vehicle_in_repair.vin
+      LEFT JOIN sale
+      ON vehicle.vin=sale.vin
+      WHERE
+        vehicle_in_repair.vin IS NULL AND
+        sale.sales_date IS NULL AND
+        vehicle_type LIKE %s
+    """
+# }}}
 # repairs
 # {{{ repairs_show_repairs()
   @property
@@ -178,6 +264,7 @@ class QueryDB:
      WHERE vin = %s
     """
 # }}}
+# reports
 # {{{ reports_seller_history()
   @property
   def reports_seller_history(self):
