@@ -67,7 +67,7 @@ def main():
     "Silver","Tan","Turquoise","White","Yellow"
   ]
   # define static list of modelyears from range 1900 to current year + 1
-  modelyears = sorted(list(range(1900, int(datetime.datetime.now().year)+1)), reverse=True) #Should this be +2?
+  modelyears = sorted(list(range(1900, int(datetime.datetime.now().year)+2)), reverse=True) 
    
   session["previous_page"] = "main"
   return render_template(
@@ -167,7 +167,7 @@ def repairs(vin=None):
   if request.method == "POST":
     if form.validate() == True:
       cursor = mysql.connection.cursor()
-      repair_status = "Pending"
+      repair_status = "pending"
       query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
       nhtsa_recall_number = form.nhtsa_recall_number.data
       if form.nhtsa_recall_number.data == "":
@@ -341,6 +341,7 @@ def purchasevehicle():
           customer_type=customer_type, customer_name=customer_name, errors=errors, session=session)
       if request.method == "POST":
           vin = request.form.get("vin")
+          session["vin"] = request.form.get("vin")
           manufacturer_name = request.form.get("manufacturer_name")
           vehicle_type = request.form.get("vehicle_type")
           model_year = request.form.get("model_year")
@@ -375,7 +376,7 @@ def purchasevehicle():
 
           session["customer"] = {}
 
-          return redirect(url_for("main"))
+          return redirect(url_for("vehicledetail", vin=vin))
 
 @app.route("/sell/vin=<string:vin>", methods=["GET", "POST"])
 def sellvehicle(vin):
@@ -425,7 +426,6 @@ def sellvehiclesubmit():
 def searchcustomer():
   print(session, file=sys.stderr)
   cursor = mysql.connection.cursor()
-  data_found = False
   
   if request.method == "GET":
     return render_template('searchcustomer.html', session=session)
@@ -433,7 +433,6 @@ def searchcustomer():
   if request.method == "POST":
     customer_type = request.form.get("customer_type")
     customer_key = request.form.get("customer_key")
-    data_found = False
 
     print(customer_key, customer_type, file=sys.stderr)
     if customer_type == "Business":
@@ -478,18 +477,33 @@ def vehicledetail(vin):
 
 
 @app.route("/searchvendor", methods=["GET", "POST"])
-def searchvendor(vendor_name=None):
-    form = VendorSearchForm()
-    cursor = mysql.connection.cursor()
-    cursor.execute(sql.search_vendor(vendor_name))
-    data = cursor.fetchall()
-    return render_template('searchvendor.html', form=form, data=data)
+def searchvendor():
+  print(session, file=sys.stderr)
+  cursor = mysql.connection.cursor()
+  
+  if request.method == "GET":
+    return render_template('searchvendor.html', session=session)
+  
+  if request.method == "POST":
+    session["vendor"]["vendor_name"] = request.form.get("vendor_name")
+
+    vendor_query = "SELECT vendor_phone_number, street, city, state, postal_code from vendor where vendor_name = %s"
+    cursor.execute(vendor_query, [session["vendor_name"]])
+    session["vendor"]["vendor_data"] = cursor.fetchone()
+    return render_template('searchcustomer.html', session=session)
+
+# @app.route("/searchvendor", methods=["GET", "POST"])
+# def searchvendor(vendor_name=None):
+#     form = VendorSearchForm()
+#     cursor = mysql.connection.cursor()
+#     cursor.execute(sql.search_vendor(vendor_name))
+#     data = cursor.fetchall()
+#     return render_template('searchvendor.html', form=form, data=data)
 
 
 @app.route('/dropdown', methods=['GET', 'POST'])
 def dropdown():
     colours = ['Red', 'Blue', 'Black', 'Orange']
-    form = CustomerID()
     if form.validate_on_submit():
       return render_template('test.html', colours=colours)
 

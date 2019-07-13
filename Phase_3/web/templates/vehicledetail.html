@@ -19,7 +19,7 @@
     Vehicle details
 </div>
 <div class="card-body">
-<table class="table">
+<table class="table table-hover" >
 <tbody>
 <tr>
     <th scope="row">VIN</th>
@@ -57,13 +57,15 @@
     <th scope="row">Sales Price</th>
     <td>{{ "$ {:,.2f}".format(vehicle_data[8]) }}</td>
 </tr>      
-<tr>
-    <th scope="row">Purchase Price</th>
-    <td>{{ "$ {:,.2f}".format(vehicle_data[9]) }}</td>
-</tr>      
+
 <tr>
     <th scope="row">Colors</th>
     <td>{{ vehicle_data[10] }}</td>
+</tr>      
+{% if session.role in ('Clerk', 'All Roles')%}
+<tr>
+        <th scope="row">Purchase Price</th>
+        <td>{{ "$ {:,.2f}".format(vehicle_data[9]) }}</td>
 </tr>      
 <tr>
     <th scope="row">Total Repair Cost</th>
@@ -73,6 +75,7 @@
         <th scope="row">Purchase date</th>
         <td>{{ seller_data[3].strftime('%Y-%m-%d') }}</td>
 </tr> 
+{% endif %}
 </tbody>
 </table>
 </div>
@@ -80,34 +83,13 @@
 
 <br>
 
-<div class="card">
-    <div class="card-header text-center alert-primary">
-        Inventory clerk information
-    </div>
-    <div class="card-body">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th scope="row">Username</th>
-                    <td>{{ seller_data[2] }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Name</th>
-                    <td>{{ seller_data[16] + " " + seller_data[17]  }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<br>
-
+{% if session.role in ('Sales Person', 'All Roles')%}
 <div class="card">
 <div class="card-header text-center alert-primary">
-    Seller Information
+    Vehicle Purchase Information
 </div>
 <div class="card-body">
-<table class="table">
+<table class="table table-hover">
 <tbody>
 {% if seller_data[9] %}
 <tr>
@@ -157,41 +139,26 @@
     <th scope="row">Postal code</th>
     <td>{{ seller_data[8] }}</td>
 </tr>
+<tr class="table-info">
+        <th scope="row">Purchased by (inventory clerk)</th>
+        <td>{{ seller_data[16] + " " + seller_data[17]  }}</td>
+    </tr>
 </tbody>
 </table>
 </div>
 </div>
+{% endif %}
 
 <br>
+{% if session.role in ('Sales Person', 'All Roles')%}
 {% if buyer_data[2] %}
-<div class="card">
-    <div class="card-header text-center alert-primary">
-        Sales person information
-    </div>
-    <div class="card-body">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th scope="row">Username</th>
-                    <td>{{ buyer_data[2] }}</td>
-                </tr>
-                <tr>
-                    <th scope="row">Name</th>
-                    <td>{{ buyer_data[16] + " " + buyer_data[17]  }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<br>
 
 <div class="card">
         <div class="card-header text-center alert-primary">
-            Purchaser Information
+            Vehicle Sale Information
         </div>
         <div class="card-body">
-        <table class="table">
+        <table class="table table-hover">
         <tbody>
         {% if buyer_data[9] %}
         <tr>
@@ -241,6 +208,10 @@
             <th scope="row">Postal code</th>
             <td>{{ seller_data[8] }}</td>
         </tr>
+        <tr class="table-info">
+                <th scope="row">Sold by (salesperson)</th>
+                <td>{{ buyer_data[16] + " " + buyer_data[17]  }}</td>
+            </tr>
         </tbody>
         </table>
         </div>
@@ -248,11 +219,12 @@
 
 <br>
 {% endif %}
+{% endif %}
 
 {% if not buyer_data[2] %}
 <a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=vehicle_data[0]) }}" >Sell Vehicle</a>
-<a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
 {% endif %}
+<a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
 </form>
 </div>
 {% endblock %}

@@ -3,37 +3,34 @@
 <!-- Page Content -->
 
 <div class="container">
-  <form action="/addmanufacturer" method="POST">
-    <div class="form-group">
-      
-      {{ wtf.quick_form(form) }}
-      <input type=submit class='btn btn-primary btn-block'>
-    </div>
-  </form>
-  <h1 class="mt-4">Monthly Sales Report Drilldown!</h1>
-  <table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Vendor Name</th>
-      <th scope="col">Vendor Phone Number</th>
-      <th scope="col">Street</th>
-      <th scope="col">City</th>
-      <th scope="col">State</th>
-      <th scope="col">Postal Code</th>
-    </tr>
-    {% for item in data %}
-    <tr>
-      <td onclick="location.href='/searchvendor/vendor_name={{item[0]}}'"><a href="searchvendor/vendor_name={{item[0]}}">>{{item[0]}}</td>
-      <td>{{item[1]}}</td>
-      <td>{{item[2]}}</td>
-      <td>{{item[3]}}</td>
-      <td>{{item[4]}}</td>
-      <td>{{item[5]}}</td>
-    </tr>
-    {% endfor %}
-  </thead>
-  <tbody>
-  </tbody>
-  </table>
+    <form action="/searchvendor" method="POST">
+      <div class="form-group">
+          <label for="vendor_name">Enter Vendor Name</label>
+          <input type="text" class="form-control" id="vendor_name" aria-describedby="emailHelp" placeholder="Enter vendor name" name="vendor_name">            
+      </div>
+      <button type="submit" class="btn btn-primary">Search vendor</button>
+    </form>
+
+    {% if session.vendor.vendor_data[0] %}
+    <ul class="list-group">
+        <li class="list-group-item">Vendor name: {{ session.vendor.vendor_name }}</li>
+        <li class="list-group-item">Vendor phone: {{ session.vendor.vendor_data[0] }}</li>
+        <li class="list-group-item">Street: {{ session.vendor.vendor_data[1] }}</li>
+        <li class="list-group-item">City: {{ session.vendor.vendor_data[2] }}</li>
+        <li class="list-group-item">State: {{ session.vendor.vendor_data[3] }}</li>
+        <li class="list-group-item">Postal code: {{ session.vendor.vendor_data[4] }}</li>
+    </ul>
+    {% endif %}
+    <br>
+    {% if not session.vendor.vendor_data[0] %}
+    <ul class="list-group">
+        <li class="list-group-item">No results</li>
+    </ul>
+    {% endif %}
+
+    
+    <a class="btn btn-primary" href="{{ url_for('repairs', vin=session.vin) }}" >Select Vendor</a>
+    
+
 </div>
 {% endblock %}
