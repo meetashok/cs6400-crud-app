@@ -130,22 +130,29 @@ def search():
     return render_template('main.html')
    
   if request.method == "POST":
-    vehicle_type = request.form['vehicle_type']
-    manufacturer = request.form['manufacturer']
-    model_year = request.form['model_year']
-    color = request.form['color']
-    keyword = request.form['keyword']
-     
-    cursor = mysql.connection.cursor()
-    query_vars = [vehicle_type, manufacturer, color, model_year, keyword] 
-    print("sql.vehicle_search:",sql.vehicle_search,file=sys.stderr)
-    print("query_vars:",query_vars,file=sys.stderr)
-    # cursor.execute(sql.vehicle_search, query_vars)
-    cursor.execute(sql.vehicle_search,[vehicle_type])
-    search_result = cursor.fetchall()
-    session["search_result"] = search_result 
-    session["search_attempt"] = True
-    return redirect(url_for("main"))
+    # authorized search by vin
+    if 'search_by_vin' in request.form:
+      print("search_by_vin!!!!",file=sys.stderr)
+      # TODO left off here...
+      return redirect(url_for("main"))
+    # public facing search request 
+    elif "public_facing_search" in request.form:
+      vehicle_type = request.form['vehicle_type']
+      manufacturer = request.form['manufacturer']
+      model_year = request.form['model_year']
+      color = request.form['color']
+      keyword = request.form['keyword']
+       
+      cursor = mysql.connection.cursor()
+      query_vars = [vehicle_type, manufacturer, color, model_year, keyword] 
+      print("sql.vehicle_search:",sql.vehicle_search,file=sys.stderr)
+      print("query_vars:",query_vars,file=sys.stderr)
+      # cursor.execute(sql.vehicle_search, query_vars)
+      cursor.execute(sql.vehicle_search,[vehicle_type])
+      search_result = cursor.fetchall()
+      session["search_result"] = search_result 
+      session["search_attempt"] = True
+      return redirect(url_for("main"))
 
 @app.route('/clear_search', methods=["GET"])
 def clear_search():
