@@ -9,7 +9,25 @@
       Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
     </p>
     {% if session.authenticated %}
-    <h3>Search by VIN</h3> 
+    <small><i>authenticated searches</i></small>
+    <h3>Search by VIN</h3>
+    {% if session.role == "All Roles"%} 
+    {% endif %}
+    {% if session.role == "Manager"%} 
+    {% endif %}
+    {% if session.role == "Clerk"%} 
+    {% endif %}
+    {% if session.role == "Sales Person"%} 
+    {% endif %}
+     
+    <!--More options appear on Search Page-->
+    <!--All authenticated Users see Search by VIN option-->
+    <!--if user.role == 'Inventory Clerk' OR 'Owner':-->
+    <!--  add Vehicle option appears-->
+    <!--  add Repair option appears-->
+    <!--if user.role == 'Manager' OR 'Owner':-->
+    <!--  Reports link appears on page-->
+     
     {% endif %}
   </div>
 </div>
@@ -116,22 +134,5 @@
     </div>
     {% endif %}
   {% endif %}
-   
-  <div class="container">
-  <p>
-    <br/>
-    "All Roles"<br/>
-    "Manager"<br/>
-    "Clerk"<br/>
-    "Sales Person"<br/>
-  </p>
-  </div>
-  <!--More options appear on Search Page-->
-  <!--All authenticated Users see Search by VIN option-->
-  <!--if user.role == 'Inventory Clerk' OR 'Owner':-->
-  <!--  add Vehicle option appears-->
-  <!--  add Repair option appears-->
-  <!--if user.role == 'Manager' OR 'Owner':-->
-  <!--  Reports link appears on page-->
 </div>
 {% endblock %}

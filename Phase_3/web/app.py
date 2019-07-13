@@ -39,7 +39,7 @@ session = {
   "search_attempt":False
 }
 
-# main page with vehicle count
+# main page
 @app.route('/', methods=['GET', 'POST'])
 def main():
   cursor = mysql.connection.cursor()
