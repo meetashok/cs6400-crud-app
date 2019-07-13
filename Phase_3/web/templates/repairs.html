@@ -4,14 +4,16 @@
 {% block content %}
 
 <div class="container">
-    {{ session }}
-  <h1 class="mt-4">Repairs!</h1>
-  {% if vin=='BLANK' %}
-  <p>no vin provided!...</p>
+  <h1 class="mt-4">Repairs</h1>
+  {% if vin == None %}
+  <p>
+    <div class="alert alert-danger" role="alert">
+      no vin provided! Return <a href="/" class="alert-link">Home</a> to start with a vehicle.
+    </div>
+  </p>
   {% endif %}
-  {% if vin!='BLANK' %}
+  {% if vin != None %}
   <p>repair info for vin (<b>{{ vin }}</b>)...</p>
-  {% endif %}
   <table class="table table-striped">
   <thead>
     <tr>
@@ -54,5 +56,6 @@
       </form>
     </div>
   </div>
+  {% endif %}
 </div>
 {% endblock %}
