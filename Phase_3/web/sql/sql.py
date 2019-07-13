@@ -170,6 +170,57 @@ class QueryDB:
 # {{{ vehicle_search()
   @property
   def vehicle_search(self):
+    return """
+      SELECT
+        vehicle.vin,
+        vehicle.vehicle_type,
+        vehicle.model_year,
+        vehicle.manufacturer_name,
+        vehicle.model_name,
+        vehicle_color_grouped.color,
+        vehicle.mileage,
+        vehicle.sales_price,
+        vehicle.vehicle_condition,
+        vehicle.vehicle_description
+      FROM vehicle
+      LEFT JOIN (
+        SELECT
+          vin,
+          GROUP_CONCAT(color ORDER BY color ASC SEPARATOR ',') as color
+        FROM vehicle_color
+        GROUP BY vin
+      ) as vehicle_color_grouped
+      ON vehicle_color_grouped.vin=vehicle.vin
+      LEFT JOIN
+      (
+        SELECT
+          distinct(vin) as vin
+        FROM repair
+        WHERE repair_status IN ('In Progress','Pending')
+      ) vehicle_in_repair
+      ON vehicle.vin=vehicle_in_repair.vin
+      LEFT JOIN sale
+      ON vehicle.vin=sale.vin
+      WHERE
+        vehicle_in_repair.vin IS NULL AND
+        sale.sales_date IS NULL AND
+         
+        vehicle_type LIKE %s AND
+        manufacturer_name LIKE %s AND
+        model_year LIKE %s AND
+        color LIKE %s AND
+        (
+          manufacturer_name LIKE %s OR
+          model_year LIKE %s OR
+          vehicle_description LIKE %s OR
+          model_name LIKE %s OR
+          color LIKE %s
+        )
+    """
+# }}}
+# {{{ vehicle_search_by_vin()
+  @property
+  def vehicle_search_by_vin(self):
     """
       SELECT
         vehicle.vin,

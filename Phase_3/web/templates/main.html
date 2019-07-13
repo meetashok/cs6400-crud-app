@@ -41,7 +41,7 @@
     {% endif %}
   </div>
 </div>
-<div class="container-fluid">
+<div class="container-fluid" style="padding-bottom: 10px;">
   <div class="container">
   <h2>Search Vehicle Inventory</h2> 
   <form action="/search" method="post">
@@ -72,7 +72,7 @@
         <option value='%' selected>All Model Years</option>
         <option disabled>_________</option>
         {% for item in modelyears %}
-        <option value={{item[0]}}>{{item}}</option>
+        <option value={{item}}>{{item}}</option>
         {% endfor %}
       </select>
     </div>
@@ -82,7 +82,7 @@
         <option value='%' selected>All Colors</option>
         <option disabled>_________</option>
         {% for item in colors %}
-        <option value={{item[0]}}>{{item}}</option>
+        <option value=%{{item}}%>{{item}}</option>
         {% endfor %}
       </select>
     </div>

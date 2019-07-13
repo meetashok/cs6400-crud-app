@@ -132,7 +132,6 @@ def search():
   if request.method == "POST":
     # authorized search by vin
     if 'search_by_vin' in request.form:
-      print("search_by_vin!!!!",file=sys.stderr)
       # TODO left off here...
       return redirect(url_for("main"))
     # public facing search request 
@@ -141,15 +140,13 @@ def search():
       manufacturer = request.form['manufacturer']
       model_year = request.form['model_year']
       color = request.form['color']
-      keyword = request.form['keyword']
+      keyword = "%"+request.form['keyword']+"%"
        
       cursor = mysql.connection.cursor()
-      query_vars = [vehicle_type, manufacturer, color, model_year, keyword] 
-      print("sql.vehicle_search:",sql.vehicle_search,file=sys.stderr)
-      print("query_vars:",query_vars,file=sys.stderr)
-      # cursor.execute(sql.vehicle_search, query_vars)
-      cursor.execute(sql.vehicle_search,[vehicle_type])
+      query_vars = [vehicle_type, manufacturer, model_year, color, keyword,keyword,keyword,keyword,keyword]
+      cursor.execute(sql.vehicle_search,query_vars)
       search_result = cursor.fetchall()
+      print("last_query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
       session["search_result"] = search_result 
       session["search_attempt"] = True
       return redirect(url_for("main"))
