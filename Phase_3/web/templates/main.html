@@ -67,51 +67,57 @@
   </form>
   </div>
    
+  <!-- Display Search Results --> 
   {% if session.search_result|length > 0 %}
   <div class="container-fluid">
-  <h2>Search returned {{session.search_result|length}} results</h2> 
-  <table class="table table-striped">
-  <thead>
-    <tr>
-      <th scope="col">VIN</th>
-      <th scope="col">Vehicle Type</th>
-      <th scope="col">Model Year</th>
-      <th scope="col">Manufacturer</th>
-      <th scope="col">Model</th>
-      <th scope="col">Color</th>
-      <th scope="col">Mileage</th>
-      <th scope="col">Sales Price</th>
-      <th scope="col">Vehicle Condition</th>
-      <th scope="col">Vehicle Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in session.search_result %}
-    <tr>
-	    <td><input class="btn btn-link" type="submit" value="{{item[0]}}"></td>
-	    <td>{{item[1]}}</td>
-	    <td>{{item[2]}}</td>
-	    <td>{{item[3]}}</td>
-	    <td>{{item[4]}}</td>
-	    <td>{{item[5]}}</td>
-	    <td>{{item[6]}}</td>
-	    <td>{{item[7]}}</td>
-	    <td>{{item[8]}}</td>
-	    <td>{{item[9]}}</td>
-	    <td>{{item[10]}}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-  </table>
+    <h2>Search returned {{session.search_result|length}} results</h2> 
+    <form action="/clear_search" method="GET">
+        <input class="btn btn-link" type="submit" value="Clear Search Results">
+    </form> 
+    <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">VIN</th>
+        <th scope="col">Vehicle Type</th>
+        <th scope="col">Model Year</th>
+        <th scope="col">Manufacturer</th>
+        <th scope="col">Model</th>
+        <th scope="col">Color</th>
+        <th scope="col">Mileage</th>
+        <th scope="col">Sales Price</th>
+        <th scope="col">Vehicle Condition</th>
+        <th scope="col">Vehicle Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in session.search_result %}
+      <tr>
+        <td><a href="/vin={{item[0]}}" class="btn btn-light active" role="button" aria-pressed="true">{{item[0]}}</a></td>
+        <td>{{item[1]}}</td>
+        <td>{{item[2]}}</td>
+        <td>{{item[3]}}</td>
+        <td>{{item[4]}}</td>
+        <td>{{item[5]}}</td>
+        <td>{{item[6]}}</td>
+        <td>{{item[7]}}</td>
+        <td>{{item[8]}}</td>
+        <td>{{item[9]}}</td>
+        <td>{{item[10]}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    </table>
   </div>
   {% endif %}
   {% if session.search_result|length == 0 %}
-  <div class="container">
-    <h2>Sorry, looks like we don’t have that in stock! </h2> 
-  </div>
+    {% if session.search_attempt %}
+    <div class="container">
+      <h2>Sorry, looks like we don’t have that in stock!</h2> 
+    </div>
+    {% endif %}
   {% endif %}
    
-  <div>
+  <div class="container">
   <p>
     <br/>
     "All Roles"<br/>

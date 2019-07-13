@@ -35,7 +35,8 @@ session = {
   "previous_page": None,
   "vin":None,
   "customer": {},
-  "search_result":[]
+  "search_result":[],
+  "search_attempt":False
 }
 
 # main page with vehicle count
@@ -143,7 +144,14 @@ def search():
     cursor.execute(sql.vehicle_search,[vehicle_type])
     search_result = cursor.fetchall()
     session["search_result"] = search_result 
+    session["search_attempt"] = True
     return redirect(url_for("main"))
+
+@app.route('/clear_search', methods=["GET"])
+def clear_search():
+  session["search_result"] = []
+  session["search_attempt"] = False   
+  return redirect(url_for("main"))
 
 @app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
