@@ -30,8 +30,7 @@ app.config['MYSQL_PORT'] = 3306
 session = {
   "authenticated":False,
   "failed_authentication":False,
-  "username": None,
-  "vendor": {},
+  "username":None,
   "role": None,
   "previous_page": None,
   "vin":None,
@@ -152,8 +151,8 @@ def logout():
 @app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
 # @login_required
-def repairs(vin="BLANK"):
-  if vin != "BLANK":
+def repairs(vin=None):
+  if vin != None:
     session["vin"] = vin
   if session["vin"]:
     vin = session["vin"]
@@ -508,7 +507,6 @@ def searchvendor():
 @app.route('/dropdown', methods=['GET', 'POST'])
 def dropdown():
     colours = ['Red', 'Blue', 'Black', 'Orange']
-    form = CustomerID()
     if form.validate_on_submit():
       return render_template('test.html', colours=colours)
 
