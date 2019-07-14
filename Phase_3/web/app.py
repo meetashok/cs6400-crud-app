@@ -35,6 +35,7 @@ session = {
   "previous_page": None,
   "vin":None,
   "customer": {},
+  "vendor": {}
 }
 
 # main page with vehicle count
@@ -488,12 +489,13 @@ def searchvendor():
     return render_template('searchvendor.html', session=session)
   
   if request.method == "POST":
+    print(request.form.get("vendor_name"), file=sys.stderr)
     session["vendor"]["vendor_name"] = request.form.get("vendor_name")
 
     vendor_query = "SELECT vendor_phone_number, street, city, state, postal_code from vendor where vendor_name = %s"
-    cursor.execute(vendor_query, [session["vendor_name"]])
+    cursor.execute(vendor_query, [session["vendor"]["vendor_name"]] ) 
     session["vendor"]["vendor_data"] = cursor.fetchone()
-    return render_template('searchcustomer.html', session=session)
+    return render_template('searchvendor.html', session=session)
 
 # @app.route("/searchvendor", methods=["GET", "POST"])
 # def searchvendor(vendor_name=None):
