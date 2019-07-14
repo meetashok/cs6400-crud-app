@@ -131,22 +131,36 @@ def search():
    
   if request.method == "POST":
     # authorized search by vin
+    cursor = mysql.connection.cursor()
     if 'search_by_vin' in request.form:
-      # TODO left off here...
+      vin = request.form['search_by_vin']
+      query_vars = [vin]
+              
+      cursor.execute(sql.vehicle_search_by_vin, query_vars)
+      search_result = cursor.fetchall()
+      print("search by vin query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      session["search_result"] = search_result 
+      session["search_attempt"] = True
       return redirect(url_for("main"))
-    # public facing search request 
-    elif "public_facing_search" in request.form:
+    # vehicle search request 
+    elif "vehicle_search" in request.form:
       vehicle_type = request.form['vehicle_type']
       manufacturer = request.form['manufacturer']
       model_year = request.form['model_year']
       color = request.form['color']
       keyword = "%"+request.form['keyword']+"%"
+      query_vars = [vehicle_type, manufacturer, model_year, color, keyword,keyword,keyword,keyword,keyword,keyword]
        
-      cursor = mysql.connection.cursor()
-      query_vars = [vehicle_type, manufacturer, model_year, color, keyword,keyword,keyword,keyword,keyword]
-      cursor.execute(sql.vehicle_search,query_vars)
-      search_result = cursor.fetchall()
-      print("last_query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      # TODO set different queries based on roles
+      if session["role"] == "Clerk":
+        cursor.execute(sql.vehicle_search_clerk, query_vars)
+        search_result = cursor.fetchall()
+        print("search by vin query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      else:
+        cursor.execute(sql.vehicle_search,query_vars)
+        search_result = cursor.fetchall()
+        print("public search query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+       
       session["search_result"] = search_result 
       session["search_attempt"] = True
       return redirect(url_for("main"))
@@ -518,6 +532,24 @@ def dropdown():
     colours = ['Red', 'Blue', 'Black', 'Orange']
     if form.validate_on_submit():
       return render_template('test.html', colours=colours)
+
+@app.route('/reports', methods=['POST'])
+def reports():
+  report_request = request.form['reports']
+  if "get_SellerHistory" in report_request:
+    return redirect(url_for("get_SellerHistory"))
+  elif "get_InventoryAge" in report_request:
+    return redirect(url_for("get_InventoryAge"))
+  elif "get_AvgTimeInInventory" in report_request:
+    return redirect(url_for("get_AvgTimeInInventory"))
+  elif "get_PricePerRepair" in report_request:
+    return redirect(url_for("get_PricePerRepair"))
+  elif "get_RepairStats" in report_request:
+    return redirect(url_for("get_RepairStats"))
+  elif "get_MonthlySales" in report_request:
+    return redirect(url_for("get_MonthlySales"))
+  elif "get_MonthlySalesDrilldown" in report_request:
+    return redirect(url_for("get_MonthlySalesDrilldown"))
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():

@@ -24,10 +24,29 @@
      
     {% if session.role == "Manager" or session.role == "All Roles"%} 
     <h3>Management Reports</h3>
+    <form action="/reports" method="post">
+    <div class="container">
+      <div class="input-group mb-3">
+        <select class="form-control" id="reports" name="reports">
+          <option value="get_SellerHistory">SellerHistory</option>
+          <option value="get_InventoryAge">InventoryAge</option>
+          <option value="get_AvgTimeInInventory">AvgTimeInInventory</option>
+          <option value="get_PricePerRepair">PricePerRepair</option>
+          <option value="get_RepairStats">RepairStats</option>
+          <option value="get_MonthlySales">MonthlySales</option>
+          <option value="get_MonthlySalesDrilldown">MonthlySalesDrilldown</option>
+        </select>
+        <div class="input-group-append">
+          <input class="btn btn-warning" type="submit" value="View Report">
+        </div>
+      </div>
+    </div>
+    </form>
+     
     {% endif %}
     {% if session.role == "Clerk" or session.role == "All Roles"%} 
-    <h3>Inventory: Add Vehicle</h3>
-    <h3>Inventory: Add Repair</h3>
+    <h3>Inventory: <a href="/addvehicletype">Add Vehicle</a></h3>
+    <h3>Inventory: <a href="/repairs">Add Repair</a></h3>
     {% endif %}
      
     <!--More options appear on Search Page-->
@@ -45,7 +64,7 @@
   <div class="container">
   <h2>Search Vehicle Inventory</h2> 
   <form action="/search" method="post">
-    <input type="hidden" id="public_facing_search" name="public_facing_search">
+    <input type="hidden" id="vehicle_search" name="vehicle_search">
     <div class="form-group">
       <label for="vehicle_type">Vehicle Type</label>
       <select class="form-control" id="vehicle_type" name="vehicle_type">
