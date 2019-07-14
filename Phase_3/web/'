@@ -12,41 +12,35 @@
     <small><i>authenticated options</i></small>
     <h3>Search by VIN</h3>
     <form action="/search" method="post">
-      <div class="container">
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" id="search_by_vin" placeholder="vin" name="search_by_vin" required>
-          <div class="input-group-append">
-            <input class="btn btn-warning" type="submit" value="Search">
-          </div>
+      <div class="form-group">
+        <div class="form-group">
+          <label for="keyword">Keyword Search</label>
+          <input type="text" class="form-control" id="search_by_vin" placeholder="search_by_vin" name="search_by_vin">
         </div>
+        <div class="form-group">
+          <input class="btn btn-warning" type="submit" value="Search">
+        </div> 
+        <select class="form-control" id="vehicle_type" name="vehicle_type">
+          <option value='%' selected>All Vehicle Types</option>
+          <option disabled>_________</option>
+          {% for item in vehicle_types %}
+          <option value={{item[0]}}>{{item[0]}}</option>
+          {% endfor %}
+        </select>
       </div>
     </form>
-     
+
+
+
+
+
+
     {% if session.role == "Manager" or session.role == "All Roles"%} 
     <h3>Management Reports</h3>
-    <form action="/reports" method="post">
-    <div class="container">
-      <div class="input-group mb-3">
-        <select class="form-control" id="reports" name="reports">
-          <option value="get_SellerHistory">SellerHistory</option>
-          <option value="get_InventoryAge">InventoryAge</option>
-          <option value="get_AvgTimeInInventory">AvgTimeInInventory</option>
-          <option value="get_PricePerRepair">PricePerRepair</option>
-          <option value="get_RepairStats">RepairStats</option>
-          <option value="get_MonthlySales">MonthlySales</option>
-          <option value="get_MonthlySalesDrilldown">MonthlySalesDrilldown</option>
-        </select>
-        <div class="input-group-append">
-          <input class="btn btn-warning" type="submit" value="View Report">
-        </div>
-      </div>
-    </div>
-    </form>
-     
     {% endif %}
     {% if session.role == "Clerk" or session.role == "All Roles"%} 
-    <h3>Inventory: <a href="/addvehicletype">Add Vehicle</a></h3>
-    <h3>Inventory: <a href="/repairs">Add Repair</a></h3>
+    <h3>Inventory: Add Vehicle</h3>
+    <h3>Inventory: Add Repair</h3>
     {% endif %}
      
     <!--More options appear on Search Page-->
@@ -60,11 +54,10 @@
     {% endif %}
   </div>
 </div>
-<div class="container-fluid" style="padding-bottom: 10px;">
+<div class="container-fluid">
   <div class="container">
   <h2>Search Vehicle Inventory</h2> 
   <form action="/search" method="post">
-    <input type="hidden" id="vehicle_search" name="vehicle_search">
     <div class="form-group">
       <label for="vehicle_type">Vehicle Type</label>
       <select class="form-control" id="vehicle_type" name="vehicle_type">
@@ -91,7 +84,7 @@
         <option value='%' selected>All Model Years</option>
         <option disabled>_________</option>
         {% for item in modelyears %}
-        <option value={{item}}>{{item}}</option>
+        <option value={{item[0]}}>{{item}}</option>
         {% endfor %}
       </select>
     </div>
@@ -101,7 +94,7 @@
         <option value='%' selected>All Colors</option>
         <option disabled>_________</option>
         {% for item in colors %}
-        <option value=%{{item}}%>{{item}}</option>
+        <option value={{item[0]}}>{{item}}</option>
         {% endfor %}
       </select>
     </div>

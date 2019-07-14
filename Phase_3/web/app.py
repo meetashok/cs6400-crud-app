@@ -35,13 +35,13 @@ session = {
   "previous_page": None,
   "vin":None,
   "customer": {},
-  "vendor": {}
+  "search_result":[],
+  "search_attempt":False
 }
 
-# main page with vehicle count
+# main page
 @app.route('/', methods=['GET', 'POST'])
 def main():
-  print("session:",session,file=sys.stderr)
   cursor = mysql.connection.cursor()
    
   # count of vehicles for sale
@@ -123,31 +123,53 @@ def logout():
   session["role"] = None
   return redirect(url_for("main"))
 
-### ##########Search form section
-### def search():
-###     form = SearchForm()
-###     if request.method == "GET":
-###         return render_template('main.html', form=form)
-### 
-###     if request.method == "POST":
-###         if form.validate() == True:
-###             vehicle_type = form.vehicle_type.data
-###             manufacturer_name = form.manufacturer_name.data
-###             color = form.color.data
-###             model_year = form.model_year.data
-###             keyword = form.keyword.data
-### 
-###             
-###             cursor = mysql.connection.cursor()
-###             query2 = "SELECT * FROM vehicle"
-###             #variables = vehicle_type, manufacturer_name, color, model_year, keyword
-###             cursor.execute((query, variables))
-###             mysql.connection.commit()
-###             # return render_template('welcome.html', query="query")
-###             return redirect(url_for("main"))
-### 
-###         else:
-###             return render_template('main.html', form=form)
+# vehicle search
+@app.route('/search', methods=["GET","POST"])
+def search():
+  if request.method == "GET":
+    return render_template('main.html')
+   
+  if request.method == "POST":
+    # authorized search by vin
+    cursor = mysql.connection.cursor()
+    if 'search_by_vin' in request.form:
+      vin = request.form['search_by_vin']
+      query_vars = [vin]
+              
+      cursor.execute(sql.vehicle_search_by_vin, query_vars)
+      search_result = cursor.fetchall()
+      print("search by vin query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      session["search_result"] = search_result 
+      session["search_attempt"] = True
+      return redirect(url_for("main"))
+    # vehicle search request 
+    elif "vehicle_search" in request.form:
+      vehicle_type = request.form['vehicle_type']
+      manufacturer = request.form['manufacturer']
+      model_year = request.form['model_year']
+      color = request.form['color']
+      keyword = "%"+request.form['keyword']+"%"
+      query_vars = [vehicle_type, manufacturer, model_year, color, keyword,keyword,keyword,keyword,keyword,keyword]
+       
+      # TODO set different queries based on roles
+      if session["role"] == "Clerk":
+        cursor.execute(sql.vehicle_search_clerk, query_vars)
+        search_result = cursor.fetchall()
+        print("search by vin query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      else:
+        cursor.execute(sql.vehicle_search,query_vars)
+        search_result = cursor.fetchall()
+        print("public search query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+       
+      session["search_result"] = search_result 
+      session["search_attempt"] = True
+      return redirect(url_for("main"))
+
+@app.route('/clear_search', methods=["GET"])
+def clear_search():
+  session["search_result"] = []
+  session["search_attempt"] = False   
+  return redirect(url_for("main"))
 
 @app.route('/repairs', methods=["GET", "POST"])
 @app.route('/repairs/vin=<string:vin>', methods=["GET", "POST"]) # http://localhost:5000/repairs/some_vin
@@ -511,6 +533,24 @@ def dropdown():
     colours = ['Red', 'Blue', 'Black', 'Orange']
     if form.validate_on_submit():
       return render_template('test.html', colours=colours)
+
+@app.route('/reports', methods=['POST'])
+def reports():
+  report_request = request.form['reports']
+  if "get_SellerHistory" in report_request:
+    return redirect(url_for("get_SellerHistory"))
+  elif "get_InventoryAge" in report_request:
+    return redirect(url_for("get_InventoryAge"))
+  elif "get_AvgTimeInInventory" in report_request:
+    return redirect(url_for("get_AvgTimeInInventory"))
+  elif "get_PricePerRepair" in report_request:
+    return redirect(url_for("get_PricePerRepair"))
+  elif "get_RepairStats" in report_request:
+    return redirect(url_for("get_RepairStats"))
+  elif "get_MonthlySales" in report_request:
+    return redirect(url_for("get_MonthlySales"))
+  elif "get_MonthlySalesDrilldown" in report_request:
+    return redirect(url_for("get_MonthlySalesDrilldown"))
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
