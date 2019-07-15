@@ -203,7 +203,7 @@ def repairs(vin=None):
    
   # add new repair info for vin
   if request.method == "POST":
-    if form.validate() == True:
+    #if form.validate() == True:
       cursor = mysql.connection.cursor()
       repair_status = "pending"
       query = "INSERT INTO repair VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
@@ -219,9 +219,10 @@ def repairs(vin=None):
       session["vendor"] = {}
       repair_data = cursor.fetchall()
       return redirect(url_for("repairs", vin=vin))
-    else:
-      print("Form was not validated!!",file=sys.stderr)
-      return render_template("repairs.html", vin=vin, form=form)
+    #else:
+    #  print("form was not validated!!", file=sys.stderr)
+    #  #return render_template("repairs.html", vin=vin, form=form)
+    #  return redirect(url_for("repairs", vin=vin, form=form))
 
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual():
