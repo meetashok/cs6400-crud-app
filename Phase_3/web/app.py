@@ -166,7 +166,7 @@ def search():
         cursor.execute(sql.vehicle_search_clerk, query_vars)
         search_result = cursor.fetchall()
         print("clerk search query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
-      if session["role"] == "Manager" or session["role"] == "All Roles":
+      elif session["role"] == "Manager" or session["role"] == "All Roles":
         if request.form["filter_sold_unsold"] == "both_sold_and_unsold":
           cursor.execute(sql.vehicle_search_management_and_burdell_both_sold_and_unsold, query_vars)
           search_result = cursor.fetchall()
