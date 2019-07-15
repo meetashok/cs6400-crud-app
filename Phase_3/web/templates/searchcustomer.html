@@ -31,8 +31,10 @@
     <br>
     {% if not session.customer.customer_type %}
     <ul class="list-group">
-        <li class="list-group-item">Not results</li>
+        <li class="list-group-item">No results? Please add Vendor using the buttons below</li>
     </ul>
+      <a class="btn btn-primary" href="{{ '/addbusiness' }}" >Add New Business</a>
+      <a class="btn btn-primary" href="{{ '/addindividual' }}" >Add New Individual</a>
     {% endif %}
     {% if session.customer.customer_type %}
     {% if session.previous_page == "purchase" %}
