@@ -4,7 +4,6 @@
 {% block content %}
 
 <div class="container">
-  {{ session }}
     <form action="/searchcustomer" method="POST">
       
       <div class="form-group">
@@ -25,7 +24,7 @@
     <ul class="list-group">
         <li class="list-group-item">Customer type: {{ session.customer.customer_type }}</li>
         <li class="list-group-item">Customer ID: {{ session.customer.customer_id }}</li>
-        <li class="list-group-item">Customer type: {{ session.customer.customer_name }}</li>
+        <li class="list-group-item">Customer Name: {{ session.customer.customer_name }}</li>
     </ul>
     {% endif %}
     <br>
