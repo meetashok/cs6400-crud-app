@@ -195,6 +195,8 @@ def repairs(vin=None):
   # show repairs info for vin
   session["previous_page"] = "repairs"
   if request.method == "GET":
+    if "vendor_name" in session["vendor"] and session["vendor"]["vendor_name"]:
+        form.vendor_name.data = session["vendor"]["vendor_name"]
     cursor = mysql.connection.cursor()
     cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
@@ -210,10 +212,14 @@ def repairs(vin=None):
       nhtsa_recall_number = form.nhtsa_recall_number.data
       if form.nhtsa_recall_number.data == "":
         nhtsa_recall_number = None
+      #if "vendor_name" in session["vendor"] and session["vendor"]["vendor_name"]:
+      #  form.vendor_name.data = session["vendor"]["vendor_name"]
       parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
       print((query,parameters), file=sys.stderr)
       cursor.execute(query, parameters)
       mysql.connection.commit()
+      session["vendor"] = {}
+      repair_data = cursor.fetchall()
       return redirect(url_for("repairs", vin=vin))
     else:
       return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
