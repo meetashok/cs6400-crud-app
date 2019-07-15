@@ -36,7 +36,8 @@ session = {
   "vin":None,
   "customer": {},
   "search_result":[],
-  "search_attempt":False
+  "search_attempt":False,
+  "vendor": {}
 }
 
 # main page
@@ -114,8 +115,6 @@ def login():
       session["failed_authentication"] = False
       session["username"] = user[0]
       session["role"] = user[2] 
-      session["search_result"] = []
-      session["search_attempt"] = False
     else:
       # Account doesnt exist or username/password incorrect
       session["authenticated"] = False
@@ -130,9 +129,6 @@ def logout():
   session["failed_authentication"] = False
   session["username"] = None
   session["role"] = None
-  session["search_result"] = []
-  session["search_attempt"] = False
-  session["vin"] = None
   return redirect(url_for("main"))
 
 # vehicle search
@@ -195,8 +191,10 @@ def repairs(vin=None):
   # show repairs info for vin
   session["previous_page"] = "repairs"
   if request.method == "GET":
-    if "vendor_name" in session["vendor"] and session["vendor"]["vendor_name"]:
+    if "vendor_name" in session["vendor"]:
+      if session["vendor"]["vendor_name"]:
         form.vendor_name.data = session["vendor"]["vendor_name"]
+    
     cursor = mysql.connection.cursor()
     cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
@@ -445,7 +443,7 @@ def sellvehicle(vin):
       vehicle_data["model_year"] = data[4]
       vehicle_data["mileage"] = data[5]
       vehicle_data["sales_price"] = data[6]
-       
+
       print(data, file=sys.stderr)
       return render_template("sellvehicle.html", vehicle_data=vehicle_data, session=session)
        
