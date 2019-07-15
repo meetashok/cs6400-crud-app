@@ -38,7 +38,13 @@
 	    <td>${{item[5]}}</td>
 	    <td>{{item[6]}}</td>
       {% if item[7] in ("pending","in progress") %}
-      <td><a href="/repairsupdate/vin={{vin}}/repairstatus={{item[7]}}">{{item[7]}}</a></td>
+      <form action="/repairsupdate" method="POST">
+        <td>
+        <input type="hidden" id="repairsupdate" name="vin" value="{{vin}}">
+        <input type="hidden" id="repairsupdate" name="repairstartdate" value="{{item[1]}}">
+        <input class="btn btn-link" type="submit" name="repairstatus" value="{{item[7]}}">
+        </td>
+      </form>
       {% endif %}
       {% if item[7] == "completed" %}
 	    <td>{{item[7]}}</td>

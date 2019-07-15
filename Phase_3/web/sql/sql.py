@@ -485,11 +485,11 @@ class QueryDB:
 # }}}
 # {{{ repairs_update_status()
   @property
-  def repairs_update_status(self, next_status):
+  def repairs_update_status(self):
     return """
      UPDATE repair
-     SET vin = vin, repair_start_date = repair_start_date, repair_end_date = repair_end_date, vendor_name = vendor_name, nhtsa_recall_number = nhtsa_recall_number, total_cost = total_cost, repair_description = repair_description, repair_status= """ +  next_status + """FROM repair 
-     WHERE vin = %s
+     SET repair_status = %s 
+     WHERE vin = %s AND repair_start_date = %s
     """
 # }}}
 # reports

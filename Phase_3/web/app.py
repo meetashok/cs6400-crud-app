@@ -239,21 +239,24 @@ def repairs(vin=None):
     #  #return render_template("repairs.html", vin=vin, form=form)
     #  return redirect(url_for("repairs", vin=vin, form=form))
 
-@app.route('/repairsupdate/vin=<string:vin>/repairstatus=<string:repairstatus>', methods=["GET", "POST"])
-def repairs_update_status(vin=None,repairstatus=None):
-  print("HEY YOU ARE IN updatestatus!", file=sys.stderr) 
+# @app.route('/repairsupdate/vin=<string:vin>/repairstartdate=<string:repairstartdate>/repairstatus=<string:repairstatus>', methods=["GET", "POST"])
+@app.route('/repairsupdate', methods=["GET", "POST"])
+def repairs_update_status():
   new_repairstatus = None
+  vin = request.form['vin']
+  repairstartdate = request.form['repairstartdate']
+  repairstatus = request.form['repairstatus']
+   
   if repairstatus == "pending":
     new_repairstatus = "in progress"
   else:
     new_repairstatus = "completed"
    
   cursor = mysql.connection.cursor()
-  cursor.execute(sql.repairs_show_repairs, [vin])
-  repair_data = cursor.fetchall()
+  query_params = [new_repairstatus,vin,repairstartdate]
+  cursor.execute(sql.repairs_update_status, query_params)
   mysql.connection.commit()
    
-  
   return redirect(url_for("repairs", vin=vin))
 
 @app.route("/addindividual", methods=['GET', 'POST'])
@@ -346,8 +349,6 @@ def addvendor():
             variables = [form.vendor_name.data, form.vendor_phone_number.data, form.street.data, form.city.data, form.state.data, form.postal_code.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
-            if form.vendor_name.data:
-               session["vendor"]["vendor_name"] = form.vendor_name.data
             return redirect(url_for("repairs", vendor_name=session["vendor"]["vendor_name"]))
         else:
             return render_template('addvendor.html', form=form)
