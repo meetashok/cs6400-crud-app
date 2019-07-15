@@ -121,6 +121,9 @@ def logout():
   session["failed_authentication"] = False
   session["username"] = None
   session["role"] = None
+  session["search_result"] = []
+  session["search_attempt"] = False
+  session["vin"] = None
   return redirect(url_for("main"))
 
 # vehicle search
@@ -427,7 +430,9 @@ def sellvehicle(vin):
       vehicle_data["model_year"] = data[4]
       vehicle_data["mileage"] = data[5]
       vehicle_data["sales_price"] = data[6]
-
+       
+      session["search_result"] = []
+      session["search_attempt"] = False
       print(data, file=sys.stderr)
       return render_template("sellvehicle.html", vehicle_data=vehicle_data, session=session)
 
