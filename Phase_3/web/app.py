@@ -452,10 +452,10 @@ def sellvehiclesubmit():
 def searchcustomer():
   print(session, file=sys.stderr)
   cursor = mysql.connection.cursor()
-  
+   
   if request.method == "GET":
     return render_template('searchcustomer.html', session=session)
-  
+   
   if request.method == "POST":
     customer_type = request.form.get("customer_type")
     customer_key = request.form.get("customer_key")

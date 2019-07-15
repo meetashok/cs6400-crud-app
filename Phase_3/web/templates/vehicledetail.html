@@ -5,8 +5,6 @@
 
 <div class="container">
     
-    {{ session }}
-    <br>
     {{ vehicle_data }}
     <br>
     {{ seller_data }}
@@ -222,9 +220,13 @@
 {% endif %}
 
 {% if not buyer_data[2] %}
-<a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=vehicle_data[0]) }}" >Sell Vehicle</a>
+  {% if session.role == "Sales Person" or session.role == "All Roles" %}
+    <a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=vehicle_data[0]) }}" >Sell Vehicle</a>
+  {% endif %}
 {% endif %}
-<a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
+{% if session.role == "Clerk" or session.role == "All Roles"%} 
+  <a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
+{% endif %}
 </form>
 </div>
 {% endblock %}
