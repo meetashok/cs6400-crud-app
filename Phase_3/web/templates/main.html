@@ -31,12 +31,12 @@
     <div class="container">
       <div class="input-group mb-3">
         <select class="form-control" id="reports" name="reports">
-          <option value="get_SellerHistory">SellerHistory</option>
-          <option value="get_InventoryAge">InventoryAge</option>
-          <option value="get_AvgTimeInInventory">AvgTimeInInventory</option>
-          <option value="get_PricePerRepair">PricePerRepair</option>
-          <option value="get_RepairStats">RepairStats</option>
-          <option value="get_MonthlySales">MonthlySales</option>
+          <option value="get_SellerHistory">Seller History</option>
+          <option value="get_InventoryAge">Inventory Age</option>
+          <option value="get_AvgTimeInInventory">Average Time In Inventory</option>
+          <option value="get_PricePerRepair">Price Per Condition</option>
+          <option value="get_RepairStats">Repair Statistics</option>
+          <option value="get_MonthlySales">Monthly Sales</option>
         </select>
         <div class="input-group-append">
           <input class="btn btn-warning" type="submit" value="View Report">
@@ -102,6 +102,17 @@
       <label for="keyword">Keyword Search</label>
       <input type="text" class="form-control" id="Keyword" placeholder="keyword search" name="keyword">
     </div>
+    {% if session.role in ("Manager","All Roles") %}
+    <div class="form-group">
+      <label for="model_year">Filter Sold/Unsold</label>
+      <select class="form-control" id="filter_sold_unsold" name="filter_sold_unsold">
+        <option value='both_sold_and_unsold' selected>All</option>
+        <option disabled>_________</option>
+        <option value='sold'>Sold</option>
+        <option value='unsold'>Unsold</option>
+      </select>
+    </div>
+    {% endif %}
     <div class="form-group">
       <input class="btn btn-warning" type="submit" value="Search">
     </div>
@@ -128,6 +139,9 @@
         <th scope="col">Sales Price</th>
         <th scope="col">Vehicle Condition</th>
         <th scope="col">Vehicle Description</th>
+        {% if session.role in ("Manager","All Roles") %}
+        <th scope="col">Sold Date</th>
+        {% endif %}
       </tr>
     </thead>
     <tbody>

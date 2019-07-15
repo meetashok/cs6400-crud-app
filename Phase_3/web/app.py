@@ -129,6 +129,8 @@ def logout():
   session["failed_authentication"] = False
   session["username"] = None
   session["role"] = None
+  session["search_result"] = [] 
+  session["search_attempt"] = False
   return redirect(url_for("main"))
 
 # vehicle search
@@ -159,11 +161,24 @@ def search():
       keyword = "%"+request.form['keyword']+"%"
       query_vars = [vehicle_type, manufacturer, model_year, color, keyword,keyword,keyword,keyword,keyword,keyword]
        
-      # TODO set different queries based on roles
+      # set different queries based on roles
       if session["role"] == "Clerk":
         cursor.execute(sql.vehicle_search_clerk, query_vars)
         search_result = cursor.fetchall()
-        print("search by vin query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+        print("clerk search query:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+      if session["role"] == "Manager" or session["role"] == "All Roles":
+        if request.form["filter_sold_unsold"] == "both_sold_and_unsold":
+          cursor.execute(sql.vehicle_search_management_and_burdell_both_sold_and_unsold, query_vars)
+          search_result = cursor.fetchall()
+          print("management/burdell search query (filter_sold_unsold):",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+        elif request.form["filter_sold_unsold"] == "sold":
+          cursor.execute(sql.vehicle_search_management_and_burdell_sold, query_vars)
+          search_result = cursor.fetchall()
+          print("management/burdell search query (filter_sold):",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
+        elif request.form["filter_sold_unsold"] == "unsold":
+          cursor.execute(sql.vehicle_search_management_and_burdell_unsold, query_vars)
+          search_result = cursor.fetchall()
+          print("management/burdell search query (filter_unsold):",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
       else:
         cursor.execute(sql.vehicle_search,query_vars)
         search_result = cursor.fetchall()
