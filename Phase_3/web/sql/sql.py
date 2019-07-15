@@ -483,6 +483,15 @@ class QueryDB:
      WHERE vin = %s
     """
 # }}}
+# {{{ repairs_update_status()
+  @property
+  def repairs_update_status(self, next_status):
+    return """
+     UPDATE repair
+     SET vin = vin, repair_start_date = repair_start_date, repair_end_date = repair_end_date, vendor_name = vendor_name, nhtsa_recall_number = nhtsa_recall_number, total_cost = total_cost, repair_description = repair_description, repair_status= """ +  next_status + """FROM repair 
+     WHERE vin = %s
+    """
+# }}}
 # reports
 # {{{ reports_seller_history()
   @property
@@ -680,7 +689,7 @@ class QueryDB:
       DATE_FORMAT(sales_date, '%Y-%m')='""" + yearmonth + """' GROUP BY 
     user.login_username
     ORDER BY
-     number_of_vehicles, total_sales DESC,
+     number_of_vehicles DESC,
      total_sales DESC
     """
 
