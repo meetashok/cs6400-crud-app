@@ -1,0 +1,13 @@
+truncate business;
+truncate customer;
+truncate individual;
+truncate manufacturer;
+truncate purchase;
+truncate recall;
+truncate repair;
+truncate sale;
+truncate user;
+truncate vehicle;
+truncate vehicle_color;
+truncate vehicle_type;
+truncate vendor;
