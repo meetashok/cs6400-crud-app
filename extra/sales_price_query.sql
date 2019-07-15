@@ -1,3 +1,7 @@
+
+USE cs6400_sm19_team013;
+SET SQL_SAFE_UPDATES = 0;
+
 update vehicle, (select 
 vehicle.vin,
 coalesce(kbb_value * 1.25, 0)  + coalesce(r.repair_cost*1.1 , 0) as sales_price
