@@ -482,6 +482,15 @@ class QueryDB:
      WHERE vin = %s
     """
 # }}}
+# {{{ repairs_update_status()
+  @property
+  def repairs_update_status(self, next_status):
+    return """
+     SELECT 
+       vin, repair_start_date, repair_end_date, vendor_name, nhtsa_recall_number, total_cost, repair_description, """ + next_status + """FROM repair 
+     WHERE vin = %s
+    """
+# }}}
 # reports
 # {{{ reports_seller_history()
   @property

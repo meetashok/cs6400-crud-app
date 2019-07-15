@@ -329,6 +329,8 @@ def addvendor():
             variables = [form.vendor_name.data, form.vendor_phone_number.data, form.street.data, form.city.data, form.state.data, form.postal_code.data]
             cursor.execute(query, variables)
             mysql.connection.commit()
+            if form.vendor_name.data:
+               session["vendor"]["vendor_name"] = form.vendor_name.data
             return redirect(url_for("repairs", vendor_name=session["vendor"]["vendor_name"]))
         else:
             return render_template('addvendor.html', form=form)
