@@ -527,7 +527,7 @@ class QueryDB:
       DATE_FORMAT(sales_date, '%Y-%m')='""" + yearmonth + """' GROUP BY 
     user.login_username
     ORDER BY
-     number_of_vehicles DESC,
+     number_of_vehicles, total_sales DESC,
      total_sales DESC
     """
 
