@@ -13,7 +13,11 @@
   </p>
   {% endif %}
   {% if vin != None %}
-  <p>repair info for vin (<b>{{ vin }}</b>)...</p>
+  {% if repair_data|length == 0 %}
+  <p>no repairs for vin: <b>{{ vin }}</b></p>
+  {% endif %}
+  {% if repair_data|length > 0 %}
+  <p>repair info for vin: <b>{{ vin }}</b></p>
   <table class="table table-striped">
   <thead>
     <tr>
@@ -58,6 +62,7 @@
     {% endfor %}
   </tbody>
   </table>
+  {% endif %}
   <p>
     {% if session.role != "Manager" %}
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
