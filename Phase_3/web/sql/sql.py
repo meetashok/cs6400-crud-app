@@ -169,6 +169,7 @@ class QueryDB:
       LEFT JOIN sale
         ON vehicle.vin=sale.vin
       WHERE 
+        vehicle_in_repair.vin IS NOT NULL AND
         sale.sales_date IS NULL; 
     """
 # }}}
