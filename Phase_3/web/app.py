@@ -218,7 +218,7 @@ def repairs(vin=None):
       repair_data = cursor.fetchall()
       return redirect(url_for("repairs", vin=vin))
     else:
-      return render_template("repairs.html", vin=vin, repair_data=repair_data, form=form)
+      return render_template("repairs.html", vin=vin, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual():
