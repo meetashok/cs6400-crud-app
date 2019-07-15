@@ -487,8 +487,8 @@ class QueryDB:
   @property
   def repairs_update_status(self, next_status):
     return """
-     SELECT 
-       vin, repair_start_date, repair_end_date, vendor_name, nhtsa_recall_number, total_cost, repair_description, """ + next_status + """FROM repair 
+     UPDATE repair
+     SET vin = vin, repair_start_date = repair_start_date, repair_end_date = repair_end_date, vendor_name = vendor_name, nhtsa_recall_number = nhtsa_recall_number, total_cost = total_cost, repair_description = repair_description, repair_status= """ +  next_status + """FROM repair 
      WHERE vin = %s
     """
 # }}}
