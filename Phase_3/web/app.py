@@ -230,6 +230,20 @@ def repairs(vin=None):
       parameters = [vin, str(form.repair_start_date.data), str(form.repair_end_date.data), form.vendor_name.data, nhtsa_recall_number, form.total_cost.data, form.repair_description.data, repair_status]
       print((query,parameters), file=sys.stderr)
       cursor.execute(query, parameters)
+      cursor.execute("""
+      update vehicle
+      set sales_price = (SELECT sum(sp) from (select 
+      coalesce(kbb_value * 1.25, 0) as sp
+      from vehicle 
+      where vin = %s
+      union all 
+      select 
+      coalesce(sum(total_cost), 0) as sp 
+      from repair
+      where vin = %s
+      group by vin) a) 
+      where vin = %s
+      """, [vin,vin, vin])
       mysql.connection.commit()
       session["vendor"] = {}
       repair_data = cursor.fetchall()

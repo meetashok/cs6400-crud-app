@@ -38,6 +38,7 @@
 	    <td>${{item[5]}}</td>
 	    <td>{{item[6]}}</td>
       {% if item[7] in ("pending","in progress") %}
+      {% if session.role != "Manager" %}
       <form action="/repairsupdate" method="POST">
         <td>
         <input type="hidden" id="repairsupdate" name="vin" value="{{vin}}">
@@ -45,6 +46,10 @@
         <input class="btn btn-link" type="submit" name="repairstatus" value="{{item[7]}}">
         </td>
       </form>
+      {% endif %}
+      {% if session.role == "Manager" %}
+      <td>{{item[7]}}</td>
+      {% endif %}
       {% endif %}
       {% if item[7] == "completed" %}
 	    <td>{{item[7]}}</td>
@@ -54,12 +59,14 @@
   </tbody>
   </table>
   <p>
+    {% if session.role != "Manager" %}
     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
       Add New Repair
     </button>
     <a class="btn btn-primary" type="button" href="{{ '/searchvendor' }}" aria-expanded="false">
       Search For Vendor Name
     </a>
+    {% endif %}
   </p>
   <div class="collapse" id="collapseExample">
     <div class="card card-body">

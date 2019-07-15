@@ -142,7 +142,7 @@
 {% endif %}
 
 <br>
-{% if session.role in ('Sales Person', 'All Roles')%}
+{% if session.role in ('Sales Person','Manager', 'All Roles')%}
 {% if buyer_data[2] %}
 
 <div class="card">
@@ -218,8 +218,8 @@
     <a class="btn btn-primary" href="{{ url_for('sellvehicle', vin=vehicle_data[0]) }}" >Sell Vehicle</a>
   {% endif %}
 {% endif %}
-{% if session.role == "Clerk" or session.role == "All Roles"%} 
-  <a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Manage Repairs</a>
+{% if session.role in ("Clerk","All Roles","Manager") %} 
+  <a class="btn btn-primary" href="{{ url_for('repairs', vin=vehicle_data[0]) }}" >Vehicle Repairs</a>
 {% endif %}
 </form>
 </div>
