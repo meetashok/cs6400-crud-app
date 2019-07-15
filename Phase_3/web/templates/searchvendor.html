@@ -11,7 +11,7 @@
       </div>
       <button type="submit" class="btn btn-primary">Search vendor</button>
     </form>
-  
+
     {% if session.vendor.vendor_data %}
     <ul class="list-group">
         <li class="list-group-item">Vendor name: {{ session.vendor.vendor_name }}</li>
@@ -25,13 +25,14 @@
     <br>
     {% if not session.vendor.vendor_data %}
     <ul class="list-group">
-        <li class="list-group-item">No results</li>
+        <li class="list-group-item">No results, please add Vendor using the button below</li>
     </ul>
+     <a class="btn btn-primary" href="{{ '/addvendor' }}" >Add New Vendor</a>
     {% endif %}
 
-    
+    {% if session.vendor.vendor_data %}
     <a class="btn btn-primary" href="{{ url_for('repairs', vin=session.vin) }}" >Select Vendor</a>
-    
+    {% endif %}
 
 </div>
 {% endblock %}

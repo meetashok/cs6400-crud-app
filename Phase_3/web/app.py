@@ -194,7 +194,7 @@ def repairs(vin=None):
     if "vendor_name" in session["vendor"]:
       if session["vendor"]["vendor_name"]:
         form.vendor_name.data = session["vendor"]["vendor_name"]
-    
+
     cursor = mysql.connection.cursor()
     cursor.execute(sql.repairs_show_repairs, [vin])
     repair_data = cursor.fetchall()
@@ -220,6 +220,7 @@ def repairs(vin=None):
       repair_data = cursor.fetchall()
       return redirect(url_for("repairs", vin=vin))
     else:
+      print("Form was not validated!!",file=sys.stderr)
       return render_template("repairs.html", vin=vin, form=form)
 
 @app.route("/addindividual", methods=['GET', 'POST'])
