@@ -61,12 +61,12 @@ class VendorForm(FlaskForm):
     submit = SubmitField("Save")
 
 class RepairForm(FlaskForm):
-    repair_start_date = DateField("Start Date", validators=[DataRequired()])
+    repair_start_date = DateField("Start Date")
     repair_end_date = DateField("End Date")
-    vendor_name = StringField("Vendor Name", validators=[DataRequired()])
+    vendor_name = StringField("Vendor Name")
     nhtsa_recall_number = StringField("NHTSA Recall Number")
-    total_cost = FloatField("Repair cost", validators=[DataRequired()])
-    repair_description = StringField("Description", validators=[DataRequired()])
+    total_cost = FloatField("Repair cost")
+    repair_description = StringField("Description")
 
 class ManufacturerForm(FlaskForm):
     manufacturer_name = StringField("Enter new manufacturer name", validators=[DataRequired()])
