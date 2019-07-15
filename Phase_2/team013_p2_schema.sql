@@ -104,7 +104,7 @@ CREATE TABLE `vehicle_type` (
 CREATE TABLE `repair` (
   vin varchar(17) NOT NULL,
   repair_start_date date NOT NULL, 
-  repair_end_date date NOT NULL,
+  repair_end_date date NULL,
   vendor_name varchar(50) NOT NULL,
   nhtsa_recall_number varchar(50) NULL,
   total_cost float(8) NOT NULL,
