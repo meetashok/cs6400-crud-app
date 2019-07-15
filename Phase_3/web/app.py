@@ -51,6 +51,12 @@ def main():
   count_vehicles_available = tmp[0] if tmp else None
   print("count_vehicles_available:",count_vehicles_available, file=sys.stderr)
    
+  # count of vehicles in inventory with repairs pending or in progress (for inventory clerk, manager, burdell)
+  cursor.execute(sql.count_vehicles_with_repairs)
+  tmp = cursor.fetchone()
+  count_vehicles_with_repairs = tmp[0] if tmp else None
+  print("count_vehicles_with_repairs:",count_vehicles_with_repairs, file=sys.stderr)
+   
   # pull vehicletypes for (public) dropdown
   cursor.execute(sql.get_vehicle_types)
   vehicle_types = cursor.fetchall()
@@ -75,6 +81,7 @@ def main():
   return render_template(
     'main.html',
     count_vehicles_available=count_vehicles_available,
+    count_vehicles_with_repairs=count_vehicles_with_repairs,
     vehicle_types=vehicle_types,
     manufacturers=manufacturers,
     colors=colors,
@@ -431,7 +438,7 @@ def sellvehicle(vin):
 
       print(data, file=sys.stderr)
       return render_template("sellvehicle.html", vehicle_data=vehicle_data, session=session)
-
+       
       # if request.method == "GET":
       #     return render_template("sellvehicle.html", vehicle_data=vehicle_data)
 
@@ -447,7 +454,10 @@ def sellvehiclesubmit():
   mysql.connection.commit()
   cursor.close()
   session["customer"] = {}
-  return redirect(url_for("main"))
+  session["search_result"] = []
+  session["search_attempt"] = False
+  # return redirect(url_for("main"))
+  return render_template('vehiclesold.html', session=session)
 
 @app.route("/searchcustomer", methods=["GET", "POST"])
 def searchcustomer():
