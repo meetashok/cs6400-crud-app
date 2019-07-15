@@ -510,7 +510,7 @@ class QueryDB:
      number_of_vehicles DESC,
      total_sales DESC"""
 # }}}
-# {{{ reports_monthly_sales_drilldown()
+# {{{ reports_search_vendor_drilldown()
   @property
   def search_vendor(self, vendor_name):
     return """
