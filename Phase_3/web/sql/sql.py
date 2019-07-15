@@ -490,7 +490,6 @@ class QueryDB:
     """
 # }}}
 # {{{ reports_monthly_sales_drilldown()
-  @property
   def reports_monthly_sales_drilldown(self, yearmonth):
     return """
     SELECT
@@ -504,11 +503,13 @@ class QueryDB:
     LEFT JOIN user
     ON sale.login_username=user.login_username
     WHERE
-      DATE_FORMAT(sales_date, '%Y-%m')=""" + "'" + yearmonth + "'" + """ GROUP BY 
+      DATE_FORMAT(sales_date, '%Y-%m')='""" + yearmonth + """' GROUP BY 
     user.login_username
     ORDER BY
      number_of_vehicles DESC,
-     total_sales DESC"""
+     total_sales DESC
+    """
+
 # }}}
 # {{{ reports_monthly_sales_drilldown()
   @property

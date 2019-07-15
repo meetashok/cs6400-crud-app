@@ -53,12 +53,12 @@ def main():
   # pull vehicletypes for (public) dropdown
   cursor.execute(sql.get_vehicle_types)
   vehicle_types = cursor.fetchall()
-  print("vehicle_types:",vehicle_types, file=sys.stderr)
+  # print("vehicle_types:",vehicle_types, file=sys.stderr)
    
   # pull manufacturers for (public) dropdown
   cursor.execute(sql.get_manufacturers)
   manufacturers = cursor.fetchall()
-  print("manufacturers:",manufacturers, file=sys.stderr)
+  # print("manufacturers:",manufacturers, file=sys.stderr)
    
   # define static list of vehicle colors (static list provided in specification document)
   colors = [
@@ -549,14 +549,15 @@ def reports():
     return redirect(url_for("get_RepairStats"))
   elif "get_MonthlySales" in report_request:
     return redirect(url_for("get_MonthlySales"))
-  elif "get_MonthlySalesDrilldown" in report_request:
-    return redirect(url_for("get_MonthlySalesDrilldown"))
+  else:
+    return redirect(url_for("main"))
 
 @app.route('/report/sellerhistory', methods=['GET'])
 def get_SellerHistory():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_seller_history)
     data = cursor.fetchall()
+    print("/report/sellerhistory:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_seller_history_table.html", data=data)
 
 @app.route('/report/inventoryage', methods=['GET'])
@@ -564,6 +565,7 @@ def get_InventoryAge():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_inventoryage)
     data = cursor.fetchall()
+    print("/report/inventoryage:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_inventory_age_table.html", data=data)
 
 @app.route('/report/averagetimeininventory', methods=['GET'])
@@ -571,6 +573,7 @@ def get_AvgTimeInInventory():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_average_time_in_inventory)
     data = cursor.fetchall()
+    print("/report/averagetimeininventory:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_avg_time_in_inventory_table.html", data=data)
 
 @app.route('/report/priceperrepair', methods=['GET'])
@@ -578,6 +581,7 @@ def get_PricePerRepair():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_price_per_repair)
     data = cursor.fetchall()
+    print("/report/priceperrepair:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_price_per_repair_table.html", data=data)
 
 @app.route('/report/repairstatistics', methods=['GET'])
@@ -585,21 +589,23 @@ def get_RepairStats():
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_repair_statistics)
     data = cursor.fetchall()
+    print("/report/repairstatistics:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_repair_stats_table.html", data=data)
 
 @app.route('/report/monthlysales', methods=['GET'])
 def get_MonthlySales():
     cursor = mysql.connection.cursor()
-    print("sql.reports_monthly_sales:",sql.reports_monthly_sales,file=sys.stderr)
     cursor.execute(sql.reports_monthly_sales)
     data = cursor.fetchall()
+    print("/report/monthlysales:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_monthly_sales_table.html", data=data)
 
 @app.route('/report/monthlysalesdrilldown/yearmonth=<string:yearmonth>', methods=['GET'])
-def get_MonthlySalesDrilldown(yearmonth=None):
+def get_MonthlySalesDrilldown(yearmonth=""):
     cursor = mysql.connection.cursor()
     cursor.execute(sql.reports_monthly_sales_drilldown(yearmonth))
     data = cursor.fetchall()
+    print("report/monthlysalesdrilldown:",cursor._last_executed.decode("utf-8") ,file=sys.stderr)
     return render_template("display_monthly_sales_drilldown_table.html", data=data)
 
 if __name__ == "__main__":
