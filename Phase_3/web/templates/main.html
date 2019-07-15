@@ -7,6 +7,9 @@
     <h1 class="display-4">Welcome!</h1>
     <p class="lead">
       Number of cars available for purchase: <b><span class="badge badge-dark">{{ count_vehicles_available }}</span></b>
+      {% if session.role in("Manager","Clerk","All Roles") %}
+      <br />Number of cars not sold with pending repairs or in progress: <b><span class="badge badge-dark">{{ count_vehicles_with_repairs }}</span></b>
+      {% endif %}
     </p>
     {% if session.authenticated %}
     <small><i>authenticated options</i></small>

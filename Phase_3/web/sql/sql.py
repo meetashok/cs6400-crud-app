@@ -151,6 +151,27 @@ class QueryDB:
         sale.sales_date IS NULL; 
     """
 # }}}
+# {{{ count_vehicles_with_repairs()
+  @property
+  def count_vehicles_with_repairs(self):
+    return """
+      SELECT
+        count(vehicle.vin) as vehicles_available
+      FROM vehicle 
+      LEFT JOIN
+      (
+        SELECT
+          distinct(vin)  as vin
+        FROM repair
+        WHERE repair_status IN ('In Progress','Pending')
+      ) vehicle_in_repair 
+      ON vehicle.vin=vehicle_in_repair.vin
+      LEFT JOIN sale
+        ON vehicle.vin=sale.vin
+      WHERE 
+        sale.sales_date IS NULL; 
+    """
+# }}}
 # {{{ get_vehicle_types()
   @property
   def get_vehicle_types(self):
