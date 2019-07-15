@@ -431,11 +431,9 @@ def sellvehicle(vin):
       vehicle_data["mileage"] = data[5]
       vehicle_data["sales_price"] = data[6]
        
-      session["search_result"] = []
-      session["search_attempt"] = False
       print(data, file=sys.stderr)
       return render_template("sellvehicle.html", vehicle_data=vehicle_data, session=session)
-
+       
       # if request.method == "GET":
       #     return render_template("sellvehicle.html", vehicle_data=vehicle_data)
 
@@ -451,7 +449,10 @@ def sellvehiclesubmit():
   mysql.connection.commit()
   cursor.close()
   session["customer"] = {}
-  return redirect(url_for("main"))
+  session["search_result"] = []
+  session["search_attempt"] = False
+  # return redirect(url_for("main"))
+  return render_template('vehiclesold.html', session=session)
 
 @app.route("/searchcustomer", methods=["GET", "POST"])
 def searchcustomer():

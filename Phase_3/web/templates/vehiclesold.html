@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Page Content -->
+<div class="jumbotron jumbotron-fluid" style="padding-top: 10px; padding-bottom: 10px;">
+  <div class="container">
+    <h1 class="display-4">Vehicle Sold!</h1>
+    <p class="lead">
+      Great job {{ session.username}}!<br />
+      return to <a href="/">Home</a>
+    </p>
+  </div>
+</div>
+
+{% endblock %}
