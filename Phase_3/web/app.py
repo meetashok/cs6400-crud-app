@@ -239,6 +239,23 @@ def repairs(vin=None):
     #  #return render_template("repairs.html", vin=vin, form=form)
     #  return redirect(url_for("repairs", vin=vin, form=form))
 
+@app.route('/repairsupdate/vin=<string:vin>/repairstatus=<string:repairstatus>', methods=["GET", "POST"])
+def repairs_update_status(vin=None,repairstatus=None):
+  print("HEY YOU ARE IN updatestatus!", file=sys.stderr) 
+  new_repairstatus = None
+  if repairstatus == "pending":
+    new_repairstatus = "in progress"
+  else:
+    new_repairstatus = "completed"
+   
+  cursor = mysql.connection.cursor()
+  cursor.execute(sql.repairs_show_repairs, [vin])
+  repair_data = cursor.fetchall()
+  mysql.connection.commit()
+   
+  
+  return redirect(url_for("repairs", vin=vin))
+
 @app.route("/addindividual", methods=['GET', 'POST'])
 def addindividual():
     form = IndividualForm()

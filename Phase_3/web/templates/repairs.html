@@ -37,7 +37,12 @@
 	    <td>{{item[4]}}</td>
 	    <td>${{item[5]}}</td>
 	    <td>{{item[6]}}</td>
+      {% if item[7] in ("pending","in progress") %}
+      <td><a href="/repairsupdate/vin={{vin}}/repairstatus={{item[7]}}">{{item[7]}}</a></td>
+      {% endif %}
+      {% if item[7] == "completed" %}
 	    <td>{{item[7]}}</td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>
