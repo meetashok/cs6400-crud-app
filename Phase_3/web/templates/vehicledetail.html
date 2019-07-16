@@ -53,7 +53,7 @@
     <th scope="row">Colors</th>
     <td>{{ vehicle_data[10] }}</td>
 </tr>      
-{% if session.role in ('Clerk', 'All Roles')%}
+{% if session.role in ('Clerk', 'Manager','All Roles')%}
 <tr>
         <th scope="row">Purchase Price</th>
         <td>{{ "$ {:,.2f}".format(vehicle_data[9]) }}</td>
